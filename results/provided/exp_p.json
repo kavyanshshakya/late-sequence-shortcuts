@@ -1,0 +1,69 @@
+{
+  "description": "Experiment P: Measures when during training the cliff emerges. Custom Mamba (medium scale, 283,874 params) trained on clean ToM data for 50 epochs, with evaluation at 9 checkpoint epochs. At each checkpoint, measures clean accuracy and shortcut gap at positions 0%, 50%, 100%. Finding: the cliff emerges sharply during epochs 5-10 coinciding with task learning, then stabilises around -8% for the remainder of training.",
+  "seeds": [42, 137, 256],
+  "checkpoint_epochs": [1, 3, 5, 7, 10, 15, 20, 30, 50],
+  "eval_positions": [0.0, 0.5, 1.0],
+  "reference_exp_h_frac_100_final": {"mean": -10.52, "std": 4.06},
+  "protocol": {
+    "n_train": 500, "n_val": 200, "n_test": 300,
+    "max_seq_len": 320, "batch_size": 16,
+    "max_epochs": 50,
+    "lr": 5e-4,
+    "weight_decay": 0.01,
+    "dropout": 0.15,
+    "grad_clip": 1.0,
+    "warmup_steps": 200,
+    "d_model": 96,
+    "n_layers": 4
+  },
+  "runs": [
+    {
+      "arch": "mamba",
+      "seed": 42,
+      "params": 283874,
+      "trajectory": [
+        {"epoch": 1, "train_loss": 0.6463, "val_acc": 79.00, "clean_acc": 80.67, "positions": {"frac_0": {"clean_acc": 80.67, "short_acc": 80.00, "gap": -0.67}, "frac_50": {"clean_acc": 80.67, "short_acc": 80.67, "gap": 0.00}, "frac_100": {"clean_acc": 80.67, "short_acc": 80.00, "gap": -0.67}}},
+        {"epoch": 3, "train_loss": 0.4985, "val_acc": 79.00, "clean_acc": 80.67, "positions": {"frac_0": {"clean_acc": 80.67, "short_acc": 80.00, "gap": -0.67}, "frac_50": {"clean_acc": 80.67, "short_acc": 80.67, "gap": 0.00}, "frac_100": {"clean_acc": 80.67, "short_acc": 80.00, "gap": -0.67}}},
+        {"epoch": 5, "train_loss": 0.3277, "val_acc": 86.50, "clean_acc": 86.33, "positions": {"frac_0": {"clean_acc": 86.33, "short_acc": 86.00, "gap": -0.33}, "frac_50": {"clean_acc": 86.33, "short_acc": 85.67, "gap": -0.67}, "frac_100": {"clean_acc": 86.33, "short_acc": 80.33, "gap": -6.00}}},
+        {"epoch": 7, "train_loss": 0.0784, "val_acc": 98.00, "clean_acc": 97.00, "positions": {"frac_0": {"clean_acc": 97.00, "short_acc": 96.67, "gap": -0.33}, "frac_50": {"clean_acc": 97.00, "short_acc": 96.33, "gap": -0.67}, "frac_100": {"clean_acc": 97.00, "short_acc": 83.00, "gap": -14.00}}},
+        {"epoch": 10, "train_loss": 0.0042, "val_acc": 100.00, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 89.33, "gap": -10.67}}},
+        {"epoch": 15, "train_loss": 0.0008, "val_acc": 100.00, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 88.33, "gap": -11.67}}},
+        {"epoch": 20, "train_loss": 0.0004, "val_acc": 100.00, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 88.33, "gap": -11.67}}},
+        {"epoch": 30, "train_loss": 0.0003, "val_acc": 100.00, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 88.00, "gap": -12.00}}},
+        {"epoch": 50, "train_loss": 0.0002, "val_acc": 100.00, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 88.00, "gap": -12.00}}}
+      ]
+    },
+    {
+      "arch": "mamba",
+      "seed": 137,
+      "params": 283874,
+      "trajectory": [
+        {"epoch": 1, "train_loss": 0.6946, "val_acc": 80.00, "clean_acc": 79.00, "positions": {"frac_0": {"clean_acc": 79.00, "short_acc": 79.33, "gap": 0.33}, "frac_50": {"clean_acc": 79.00, "short_acc": 79.33, "gap": 0.33}, "frac_100": {"clean_acc": 79.00, "short_acc": 80.00, "gap": 1.00}}},
+        {"epoch": 3, "train_loss": 0.4833, "val_acc": 81.00, "clean_acc": 79.67, "positions": {"frac_0": {"clean_acc": 79.67, "short_acc": 79.67, "gap": 0.00}, "frac_50": {"clean_acc": 79.67, "short_acc": 80.00, "gap": 0.33}, "frac_100": {"clean_acc": 79.67, "short_acc": 80.67, "gap": 1.00}}},
+        {"epoch": 5, "train_loss": 0.3587, "val_acc": 91.50, "clean_acc": 91.00, "positions": {"frac_0": {"clean_acc": 91.00, "short_acc": 90.67, "gap": -0.33}, "frac_50": {"clean_acc": 91.00, "short_acc": 90.67, "gap": -0.33}, "frac_100": {"clean_acc": 91.00, "short_acc": 89.00, "gap": -2.00}}},
+        {"epoch": 7, "train_loss": 0.0757, "val_acc": 98.50, "clean_acc": 98.00, "positions": {"frac_0": {"clean_acc": 98.00, "short_acc": 97.67, "gap": -0.33}, "frac_50": {"clean_acc": 98.00, "short_acc": 97.33, "gap": -0.67}, "frac_100": {"clean_acc": 98.00, "short_acc": 93.00, "gap": -5.00}}},
+        {"epoch": 10, "train_loss": 0.0037, "val_acc": 99.50, "clean_acc": 99.67, "positions": {"frac_0": {"clean_acc": 99.67, "short_acc": 99.67, "gap": 0.00}, "frac_50": {"clean_acc": 99.67, "short_acc": 99.33, "gap": -0.33}, "frac_100": {"clean_acc": 99.67, "short_acc": 90.00, "gap": -9.67}}},
+        {"epoch": 15, "train_loss": 0.0010, "val_acc": 99.50, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 93.00, "gap": -7.00}}},
+        {"epoch": 20, "train_loss": 0.0004, "val_acc": 99.50, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 92.67, "gap": -7.33}}},
+        {"epoch": 30, "train_loss": 0.0002, "val_acc": 99.50, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 92.33, "gap": -7.67}}},
+        {"epoch": 50, "train_loss": 0.0001, "val_acc": 99.50, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 92.00, "gap": -8.00}}}
+      ]
+    },
+    {
+      "arch": "mamba",
+      "seed": 256,
+      "params": 283874,
+      "trajectory": [
+        {"epoch": 1, "train_loss": 0.6602, "val_acc": 82.00, "clean_acc": 80.67, "positions": {"frac_0": {"clean_acc": 80.67, "short_acc": 80.33, "gap": -0.33}, "frac_50": {"clean_acc": 80.67, "short_acc": 80.67, "gap": 0.00}, "frac_100": {"clean_acc": 80.67, "short_acc": 80.00, "gap": -0.67}}},
+        {"epoch": 3, "train_loss": 0.5049, "val_acc": 82.00, "clean_acc": 80.67, "positions": {"frac_0": {"clean_acc": 80.67, "short_acc": 80.33, "gap": -0.33}, "frac_50": {"clean_acc": 80.67, "short_acc": 80.67, "gap": 0.00}, "frac_100": {"clean_acc": 80.67, "short_acc": 80.00, "gap": -0.67}}},
+        {"epoch": 5, "train_loss": 0.3611, "val_acc": 95.00, "clean_acc": 93.00, "positions": {"frac_0": {"clean_acc": 93.00, "short_acc": 93.00, "gap": 0.00}, "frac_50": {"clean_acc": 93.00, "short_acc": 92.67, "gap": -0.33}, "frac_100": {"clean_acc": 93.00, "short_acc": 83.67, "gap": -9.33}}},
+        {"epoch": 7, "train_loss": 0.0469, "val_acc": 100.00, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 94.00, "gap": -6.00}}},
+        {"epoch": 10, "train_loss": 0.0037, "val_acc": 100.00, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 94.00, "gap": -6.00}}},
+        {"epoch": 15, "train_loss": 0.0010, "val_acc": 100.00, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 94.67, "gap": -5.33}}},
+        {"epoch": 20, "train_loss": 0.0004, "val_acc": 100.00, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 95.67, "gap": -4.33}}},
+        {"epoch": 30, "train_loss": 0.0003, "val_acc": 100.00, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 93.33, "gap": -6.67}}},
+        {"epoch": 50, "train_loss": 0.0002, "val_acc": 100.00, "clean_acc": 100.00, "positions": {"frac_0": {"clean_acc": 100.00, "short_acc": 100.00, "gap": 0.00}, "frac_50": {"clean_acc": 100.00, "short_acc": 99.67, "gap": -0.33}, "frac_100": {"clean_acc": 100.00, "short_acc": 95.00, "gap": -5.00}}}
+      ]
+    }
+  ]
+}

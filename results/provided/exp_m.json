@@ -1,0 +1,348 @@
+{
+  "description": "Experiment M: State probing for overwriting mechanism. Measures cosine similarity between clean and shortcut-inserted final-token hidden states across 9 positions. 3 archs x 3 seeds = 9 training runs (each model evaluated against paired clean/shortcut inputs at 9 positions).",
+  "experiment": "state_probing_final_token",
+  "metric": "cosine similarity between final-token hidden states (clean vs shortcut-inserted, paired narratives)",
+  "scale": "medium",
+  "n_seeds": 3,
+  "seeds": [
+    42,
+    137,
+    256
+  ],
+  "archs": [
+    "transformer",
+    "lstm",
+    "mamba"
+  ],
+  "positions_tested": [
+    0,
+    25,
+    50,
+    75,
+    80,
+    85,
+    90,
+    95,
+    100
+  ],
+  "training_epochs": 40,
+  "n_probe_examples_per_position": 100,
+  "runs": [
+    {
+      "seed": 42,
+      "arch": "transformer",
+      "scale": "medium",
+      "val_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "final_token_cos_sim": 0.976
+        },
+        "frac_25": {
+          "final_token_cos_sim": 0.984
+        },
+        "frac_50": {
+          "final_token_cos_sim": 0.991
+        },
+        "frac_75": {
+          "final_token_cos_sim": 0.988
+        },
+        "frac_80": {
+          "final_token_cos_sim": 0.988
+        },
+        "frac_85": {
+          "final_token_cos_sim": 0.969
+        },
+        "frac_90": {
+          "final_token_cos_sim": 0.982
+        },
+        "frac_95": {
+          "final_token_cos_sim": 0.948
+        },
+        "frac_100": {
+          "final_token_cos_sim": 0.956
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "arch": "lstm",
+      "scale": "medium",
+      "val_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_25": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_50": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_75": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_80": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_85": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_90": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_95": {
+          "final_token_cos_sim": 0.986
+        },
+        "frac_100": {
+          "final_token_cos_sim": 0.955
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "arch": "mamba",
+      "scale": "medium",
+      "val_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_25": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_50": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_75": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_80": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_85": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_90": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_95": {
+          "final_token_cos_sim": 0.852
+        },
+        "frac_100": {
+          "final_token_cos_sim": 0.612
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "arch": "transformer",
+      "scale": "medium",
+      "val_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "final_token_cos_sim": 0.993
+        },
+        "frac_25": {
+          "final_token_cos_sim": 0.994
+        },
+        "frac_50": {
+          "final_token_cos_sim": 0.994
+        },
+        "frac_75": {
+          "final_token_cos_sim": 0.992
+        },
+        "frac_80": {
+          "final_token_cos_sim": 0.993
+        },
+        "frac_85": {
+          "final_token_cos_sim": 0.99
+        },
+        "frac_90": {
+          "final_token_cos_sim": 0.994
+        },
+        "frac_95": {
+          "final_token_cos_sim": 0.985
+        },
+        "frac_100": {
+          "final_token_cos_sim": 0.993
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "arch": "lstm",
+      "scale": "medium",
+      "val_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_25": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_50": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_75": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_80": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_85": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_90": {
+          "final_token_cos_sim": 0.999
+        },
+        "frac_95": {
+          "final_token_cos_sim": 0.998
+        },
+        "frac_100": {
+          "final_token_cos_sim": 0.994
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "arch": "mamba",
+      "scale": "medium",
+      "val_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_25": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_50": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_75": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_80": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_85": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_90": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_95": {
+          "final_token_cos_sim": 0.868
+        },
+        "frac_100": {
+          "final_token_cos_sim": 0.641
+        }
+      }
+    },
+    {
+      "seed": 256,
+      "arch": "transformer",
+      "scale": "medium",
+      "val_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "final_token_cos_sim": 0.992
+        },
+        "frac_25": {
+          "final_token_cos_sim": 0.992
+        },
+        "frac_50": {
+          "final_token_cos_sim": 0.992
+        },
+        "frac_75": {
+          "final_token_cos_sim": 0.992
+        },
+        "frac_80": {
+          "final_token_cos_sim": 0.992
+        },
+        "frac_85": {
+          "final_token_cos_sim": 0.991
+        },
+        "frac_90": {
+          "final_token_cos_sim": 0.992
+        },
+        "frac_95": {
+          "final_token_cos_sim": 0.992
+        },
+        "frac_100": {
+          "final_token_cos_sim": 0.993
+        }
+      }
+    },
+    {
+      "seed": 256,
+      "arch": "lstm",
+      "scale": "medium",
+      "val_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_25": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_50": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_75": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_80": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_85": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_90": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_95": {
+          "final_token_cos_sim": 0.938
+        },
+        "frac_100": {
+          "final_token_cos_sim": 0.833
+        }
+      }
+    },
+    {
+      "seed": 256,
+      "arch": "mamba",
+      "scale": "medium",
+      "val_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_25": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_50": {
+          "final_token_cos_sim": 1.0
+        },
+        "frac_75": {
+          "final_token_cos_sim": 0.999
+        },
+        "frac_80": {
+          "final_token_cos_sim": 0.999
+        },
+        "frac_85": {
+          "final_token_cos_sim": 0.998
+        },
+        "frac_90": {
+          "final_token_cos_sim": 0.998
+        },
+        "frac_95": {
+          "final_token_cos_sim": 0.816
+        },
+        "frac_100": {
+          "final_token_cos_sim": 0.599
+        }
+      }
+    }
+  ],
+  "note": "Representation-space cliff: Transformer ~0.98 across all positions (no cliff); LSTM drops from 1.000 at 90% to 0.927 at 100%; Mamba drops from 0.999 at 90% to 0.618 at 100%. The representation cliff mirrors the accuracy cliff in Exp H, providing direct evidence for the state-overwriting mechanism."
+}

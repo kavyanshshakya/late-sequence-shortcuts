@@ -1,0 +1,179 @@
+{
+  "description": "Experiment I: Correlation strength ablation. Tests shortcut gap at 50%, 70%, 90% correlation levels across 3 seeds per condition.",
+  "experiment": "I_correlation_ablation",
+  "seeds": [
+    42,
+    137,
+    256
+  ],
+  "scale": "medium",
+  "correlations": [
+    0.5,
+    0.7,
+    0.9
+  ],
+  "runs": [
+    {
+      "arch": "transformer",
+      "seed": 42,
+      "correlation": 0.5,
+      "gap": 0.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 42,
+      "correlation": 0.7,
+      "gap": 0.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 42,
+      "correlation": 0.9,
+      "gap": 0.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 42,
+      "correlation": 0.5,
+      "gap": 0.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 42,
+      "correlation": 0.7,
+      "gap": -1.3
+    },
+    {
+      "arch": "lstm",
+      "seed": 42,
+      "correlation": 0.9,
+      "gap": -1.7
+    },
+    {
+      "arch": "mamba",
+      "seed": 42,
+      "correlation": 0.5,
+      "gap": 0.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 42,
+      "correlation": 0.7,
+      "gap": -11.3
+    },
+    {
+      "arch": "mamba",
+      "seed": 42,
+      "correlation": 0.9,
+      "gap": -16.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 137,
+      "correlation": 0.5,
+      "gap": 0.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 137,
+      "correlation": 0.7,
+      "gap": 0.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 137,
+      "correlation": 0.9,
+      "gap": 0.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 137,
+      "correlation": 0.5,
+      "gap": 0.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 137,
+      "correlation": 0.7,
+      "gap": -4.3
+    },
+    {
+      "arch": "lstm",
+      "seed": 137,
+      "correlation": 0.9,
+      "gap": -5.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 137,
+      "correlation": 0.5,
+      "gap": 0.3
+    },
+    {
+      "arch": "mamba",
+      "seed": 137,
+      "correlation": 0.7,
+      "gap": -12.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 137,
+      "correlation": 0.9,
+      "gap": -14.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 256,
+      "correlation": 0.5,
+      "gap": 0.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 256,
+      "correlation": 0.7,
+      "gap": 0.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 256,
+      "correlation": 0.9,
+      "gap": 0.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 256,
+      "correlation": 0.5,
+      "gap": 0.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 256,
+      "correlation": 0.7,
+      "gap": 0.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 256,
+      "correlation": 0.9,
+      "gap": -0.7
+    },
+    {
+      "arch": "mamba",
+      "seed": 256,
+      "correlation": 0.5,
+      "gap": 0.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 256,
+      "correlation": 0.7,
+      "gap": -5.7
+    },
+    {
+      "arch": "mamba",
+      "seed": 256,
+      "correlation": 0.9,
+      "gap": -8.0
+    }
+  ]
+}

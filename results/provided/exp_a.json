@@ -1,0 +1,184 @@
+{
+  "description": "Small scale, clean-trained, 3 archs x 5 seeds",
+  "scale": "small",
+  "training": "clean",
+  "runs": [
+    {
+      "arch": "transformer",
+      "seed": 42,
+      "params": 73202,
+      "clean": 100.0,
+      "short": 100.0,
+      "gap": 0.0,
+      "memo": 100.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 137,
+      "params": 73202,
+      "clean": 100.0,
+      "short": 100.0,
+      "gap": 0.0,
+      "memo": 100.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 256,
+      "params": 73202,
+      "clean": 100.0,
+      "short": 100.0,
+      "gap": 0.0,
+      "memo": 100.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 789,
+      "params": 73202,
+      "clean": 100.0,
+      "short": 100.0,
+      "gap": 0.0,
+      "memo": 100.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 1024,
+      "params": 73202,
+      "clean": 100.0,
+      "short": 100.0,
+      "gap": 0.0,
+      "memo": 100.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 42,
+      "params": 45170,
+      "clean": 99.67,
+      "short": 99.67,
+      "gap": 0.0,
+      "memo": 98.67
+    },
+    {
+      "arch": "lstm",
+      "seed": 137,
+      "params": 45170,
+      "clean": 100.0,
+      "short": 86.67,
+      "gap": -13.33,
+      "memo": 100.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 256,
+      "params": 45170,
+      "clean": 100.0,
+      "short": 99.67,
+      "gap": -0.33,
+      "memo": 100.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 789,
+      "params": 45170,
+      "clean": 100.0,
+      "short": 86.67,
+      "gap": -13.33,
+      "memo": 100.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 1024,
+      "params": 45170,
+      "clean": 100.0,
+      "short": 82.0,
+      "gap": -18.0,
+      "memo": 100.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 42,
+      "params": 55058,
+      "clean": 100.0,
+      "short": 81.33,
+      "gap": -18.67,
+      "memo": 99.67
+    },
+    {
+      "arch": "mamba",
+      "seed": 137,
+      "params": 55058,
+      "clean": 100.0,
+      "short": 85.33,
+      "gap": -14.67,
+      "memo": 100.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 256,
+      "params": 55058,
+      "clean": 100.0,
+      "short": 92.67,
+      "gap": -7.33,
+      "memo": 99.67
+    },
+    {
+      "arch": "mamba",
+      "seed": 789,
+      "params": 55058,
+      "clean": 100.0,
+      "short": 86.33,
+      "gap": -13.67,
+      "memo": 99.67
+    },
+    {
+      "arch": "mamba",
+      "seed": 1024,
+      "params": 55058,
+      "clean": 99.67,
+      "short": 89.33,
+      "gap": -10.33,
+      "memo": 96.67
+    }
+  ],
+  "summary": {
+    "transformer": {
+      "mean": -0.0,
+      "std": 0.0
+    },
+    "lstm": {
+      "mean": -9.0,
+      "std": 8.29
+    },
+    "mamba": {
+      "mean": -12.93,
+      "std": 4.32
+    }
+  },
+  "training_protocol": {
+    "n_train": 500,
+    "n_test": 300,
+    "n_val": 200,
+    "batch_size": 16,
+    "lr": 0.0005,
+    "optimizer": "AdamW",
+    "weight_decay": 0.01,
+    "scheduler": "cosine_200warmup",
+    "gradient_clip": 1.0,
+    "dropout": 0.15,
+    "patience": 30,
+    "eval_every": 5,
+    "max_seq_len": 320,
+    "max_epochs": 150,
+    "seeds_5": [
+      42,
+      137,
+      256,
+      789,
+      1024
+    ],
+    "seeds_3": [
+      42,
+      137,
+      256
+    ]
+  }
+}

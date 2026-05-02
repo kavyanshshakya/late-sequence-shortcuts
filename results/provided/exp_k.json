@@ -1,0 +1,150 @@
+{
+  "description": "Experiment K: Unidirectional LSTM control. Tests whether the end-position vulnerability depends on bidirectionality.",
+  "scale": "medium",
+  "n_seeds": 10,
+  "seeds": [
+    42,
+    137,
+    256,
+    789,
+    1024,
+    2048,
+    4096,
+    8192,
+    16384,
+    32768
+  ],
+  "runs": [
+    {
+      "arch": "unidirectional_lstm",
+      "seed": 42,
+      "scale": "medium",
+      "params": 321122,
+      "clean_acc": 99.67,
+      "gap_end": 0.0,
+      "gap_begin": 0.33,
+      "short_acc_end": 99.67,
+      "short_acc_begin": 100.0
+    },
+    {
+      "arch": "unidirectional_lstm",
+      "seed": 137,
+      "scale": "medium",
+      "params": 321122,
+      "clean_acc": 99.67,
+      "gap_end": 0.33,
+      "gap_begin": 0.33,
+      "short_acc_end": 100.0,
+      "short_acc_begin": 100.0
+    },
+    {
+      "arch": "unidirectional_lstm",
+      "seed": 256,
+      "scale": "medium",
+      "params": 321122,
+      "clean_acc": 100.0,
+      "gap_end": -3.0,
+      "gap_begin": -0.33,
+      "short_acc_end": 97.0,
+      "short_acc_begin": 99.67
+    },
+    {
+      "arch": "unidirectional_lstm",
+      "seed": 789,
+      "scale": "medium",
+      "params": 321122,
+      "clean_acc": 100.0,
+      "gap_end": -2.67,
+      "gap_begin": 0.0,
+      "short_acc_end": 97.33,
+      "short_acc_begin": 100.0
+    },
+    {
+      "arch": "unidirectional_lstm",
+      "seed": 1024,
+      "scale": "medium",
+      "params": 321122,
+      "clean_acc": 100.0,
+      "gap_end": -12.33,
+      "gap_begin": 0.0,
+      "short_acc_end": 87.67,
+      "short_acc_begin": 100.0
+    },
+    {
+      "arch": "unidirectional_lstm",
+      "seed": 2048,
+      "scale": "medium",
+      "params": 321122,
+      "clean_acc": 99.67,
+      "gap_end": -6.0,
+      "gap_begin": 0.0,
+      "short_acc_end": 93.67,
+      "short_acc_begin": 99.67
+    },
+    {
+      "arch": "unidirectional_lstm",
+      "seed": 4096,
+      "scale": "medium",
+      "params": 321122,
+      "clean_acc": 100.0,
+      "gap_end": -1.0,
+      "gap_begin": -0.67,
+      "short_acc_end": 99.0,
+      "short_acc_begin": 99.33
+    },
+    {
+      "arch": "unidirectional_lstm",
+      "seed": 8192,
+      "scale": "medium",
+      "params": 321122,
+      "clean_acc": 100.0,
+      "gap_end": 0.0,
+      "gap_begin": 0.0,
+      "short_acc_end": 100.0,
+      "short_acc_begin": 100.0
+    },
+    {
+      "arch": "unidirectional_lstm",
+      "seed": 16384,
+      "scale": "medium",
+      "params": 321122,
+      "clean_acc": 100.0,
+      "gap_end": -0.33,
+      "gap_begin": -0.33,
+      "short_acc_end": 99.67,
+      "short_acc_begin": 99.67
+    },
+    {
+      "arch": "unidirectional_lstm",
+      "seed": 32768,
+      "scale": "medium",
+      "params": 321122,
+      "clean_acc": 99.33,
+      "gap_end": -12.66,
+      "gap_begin": 0.34,
+      "short_acc_end": 86.67,
+      "short_acc_begin": 99.67
+    }
+  ],
+  "note": "Both variants preserve begin-vs-end asymmetry. Bidirectionality is not required for the vulnerability. Unidirectional 10-seed end-gap -3.77 +/- 4.99 vs Bidirectional 5-seed -11.00 +/- 9.34 (Welch's t=1.62, p=0.16).",
+  "bidirectional_baseline_comparison": {
+    "source": "Experiment H (9-position sweep, 100% position), 5 seeds, medium scale",
+    "unidirectional_lstm_10seed": {
+      "end_mean": -3.77,
+      "end_std": 4.99,
+      "begin_mean": -0.03,
+      "begin_std": 0.33
+    },
+    "bidirectional_lstm_5seed": {
+      "end_mean": -11.0,
+      "end_std": 9.34,
+      "begin_mean": 0.0,
+      "begin_std": 0.0
+    },
+    "welch_ttest": {
+      "t": 1.62,
+      "p": 0.16,
+      "note": "Not statistically distinguishable."
+    }
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "description": "Per ToM scenario type, clean-trained, shortcut test, 3 seeds",
+  "scale": "medium",
+  "note": "All types except true_2move are 100% for all archs across all seeds",
+  "per_scenario_seed42": {
+    "transformer": {
+      "2move_fb": 0.0,
+      "3move_fb": 0.0,
+      "2nd_order": 0.0,
+      "classic_fb": 0.0,
+      "true_2move": 0.0
+    },
+    "lstm": {
+      "2move_fb": 0.0,
+      "3move_fb": 0.0,
+      "2nd_order": 0.0,
+      "classic_fb": 0.0,
+      "true_2move": -7.94
+    },
+    "mamba": {
+      "2move_fb": 0.0,
+      "3move_fb": 0.0,
+      "2nd_order": 0.0,
+      "classic_fb": 0.0,
+      "true_2move": -84.13
+    }
+  },
+  "true_2move_results": [
+    {
+      "arch": "transformer",
+      "seed": 42,
+      "short_acc": 100.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 137,
+      "short_acc": 100.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 256,
+      "short_acc": 100.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 42,
+      "short_acc": 92.06,
+      "n_correct": 58,
+      "n_total": 63
+    },
+    {
+      "arch": "lstm",
+      "seed": 137,
+      "short_acc": 66.0,
+      "n_correct": 33,
+      "n_total": 50
+    },
+    {
+      "arch": "lstm",
+      "seed": 256,
+      "short_acc": 95.24,
+      "n_correct": 60,
+      "n_total": 63
+    },
+    {
+      "arch": "mamba",
+      "seed": 42,
+      "short_acc": 15.87,
+      "n_correct": 10,
+      "n_total": 63
+    },
+    {
+      "arch": "mamba",
+      "seed": 137,
+      "short_acc": 24.0,
+      "n_correct": 12,
+      "n_total": 50
+    },
+    {
+      "arch": "mamba",
+      "seed": 256,
+      "short_acc": 53.97,
+      "n_correct": 34,
+      "n_total": 63
+    }
+  ],
+  "finding": "Vulnerability concentrated in true_2move (label=1). Mamba: 15.87-53.97%.",
+  "training_protocol": {
+    "n_train": 500,
+    "n_test": 300,
+    "n_val": 200,
+    "batch_size": 16,
+    "lr": 0.0005,
+    "optimizer": "AdamW",
+    "weight_decay": 0.01,
+    "scheduler": "cosine_200warmup",
+    "gradient_clip": 1.0,
+    "dropout": 0.15,
+    "patience": 30,
+    "eval_every": 5,
+    "max_seq_len": 320,
+    "max_epochs": 150,
+    "seeds_5": [
+      42,
+      137,
+      256,
+      789,
+      1024
+    ],
+    "seeds_3": [
+      42,
+      137,
+      256
+    ]
+  }
+}

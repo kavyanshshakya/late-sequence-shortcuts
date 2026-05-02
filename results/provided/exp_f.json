@@ -1,0 +1,107 @@
+{
+  "description": "Trained on clean, tested on shortcut-only input (no narrative)",
+  "scale": "medium",
+  "runs": [
+    {
+      "arch": "transformer",
+      "seed": 42,
+      "clean": 100.0,
+      "short": 100.0,
+      "short_only": 48.67,
+      "gap": 0.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 137,
+      "clean": 100.0,
+      "short": 100.0,
+      "short_only": 50.0,
+      "gap": 0.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 256,
+      "clean": 100.0,
+      "short": 100.0,
+      "short_only": 51.67,
+      "gap": 0.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 42,
+      "clean": 100.0,
+      "short": 98.33,
+      "short_only": 45.33,
+      "gap": -1.67
+    },
+    {
+      "arch": "lstm",
+      "seed": 137,
+      "clean": 100.0,
+      "short": 94.33,
+      "short_only": 49.67,
+      "gap": -5.67
+    },
+    {
+      "arch": "lstm",
+      "seed": 256,
+      "clean": 100.0,
+      "short": 99.0,
+      "short_only": 50.0,
+      "gap": -1.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 42,
+      "clean": 100.0,
+      "short": 82.33,
+      "short_only": 51.33,
+      "gap": -17.67
+    },
+    {
+      "arch": "mamba",
+      "seed": 137,
+      "clean": 100.0,
+      "short": 87.33,
+      "short_only": 50.0,
+      "gap": -12.67
+    },
+    {
+      "arch": "mamba",
+      "seed": 256,
+      "clean": 100.0,
+      "short": 90.33,
+      "short_only": 48.33,
+      "gap": -9.67
+    }
+  ],
+  "finding": "All architectures at chance (~50%) on shortcut-only across all seeds.",
+  "training_protocol": {
+    "n_train": 500,
+    "n_test": 300,
+    "n_val": 200,
+    "batch_size": 16,
+    "lr": 0.0005,
+    "optimizer": "AdamW",
+    "weight_decay": 0.01,
+    "scheduler": "cosine_200warmup",
+    "gradient_clip": 1.0,
+    "dropout": 0.15,
+    "patience": 30,
+    "eval_every": 5,
+    "max_seq_len": 320,
+    "max_epochs": 150,
+    "seeds_5": [
+      42,
+      137,
+      256,
+      789,
+      1024
+    ],
+    "seeds_3": [
+      42,
+      137,
+      256
+    ]
+  }
+}

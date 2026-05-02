@@ -1,0 +1,179 @@
+{
+  "description": "Experiment J: Shortcut type generalization. Tests three shortcut forms (semantic, lexical repetition, arbitrary label-correlated tokens) across 3 seeds per type.",
+  "experiment": "J_shortcut_types",
+  "seeds": [
+    42,
+    137,
+    256
+  ],
+  "scale": "medium",
+  "shortcut_types": [
+    "semantic",
+    "lexical",
+    "arbitrary"
+  ],
+  "runs": [
+    {
+      "arch": "transformer",
+      "seed": 42,
+      "type": "semantic",
+      "gap": 0.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 42,
+      "type": "lexical",
+      "gap": 0.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 42,
+      "type": "arbitrary",
+      "gap": 0.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 42,
+      "type": "semantic",
+      "gap": -2.3
+    },
+    {
+      "arch": "lstm",
+      "seed": 42,
+      "type": "lexical",
+      "gap": -6.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 42,
+      "type": "arbitrary",
+      "gap": 0.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 42,
+      "type": "semantic",
+      "gap": -13.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 42,
+      "type": "lexical",
+      "gap": -18.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 42,
+      "type": "arbitrary",
+      "gap": -14.7
+    },
+    {
+      "arch": "transformer",
+      "seed": 137,
+      "type": "semantic",
+      "gap": 0.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 137,
+      "type": "lexical",
+      "gap": 0.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 137,
+      "type": "arbitrary",
+      "gap": 0.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 137,
+      "type": "semantic",
+      "gap": -8.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 137,
+      "type": "lexical",
+      "gap": -3.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 137,
+      "type": "arbitrary",
+      "gap": 0.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 137,
+      "type": "semantic",
+      "gap": -15.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 137,
+      "type": "lexical",
+      "gap": 0.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 137,
+      "type": "arbitrary",
+      "gap": 0.7
+    },
+    {
+      "arch": "transformer",
+      "seed": 256,
+      "type": "semantic",
+      "gap": 0.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 256,
+      "type": "lexical",
+      "gap": 0.0
+    },
+    {
+      "arch": "transformer",
+      "seed": 256,
+      "type": "arbitrary",
+      "gap": 0.0
+    },
+    {
+      "arch": "lstm",
+      "seed": 256,
+      "type": "semantic",
+      "gap": -1.7
+    },
+    {
+      "arch": "lstm",
+      "seed": 256,
+      "type": "lexical",
+      "gap": -5.3
+    },
+    {
+      "arch": "lstm",
+      "seed": 256,
+      "type": "arbitrary",
+      "gap": 0.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 256,
+      "type": "semantic",
+      "gap": -10.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 256,
+      "type": "lexical",
+      "gap": -15.0
+    },
+    {
+      "arch": "mamba",
+      "seed": 256,
+      "type": "arbitrary",
+      "gap": -1.7
+    }
+  ]
+}

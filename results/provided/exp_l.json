@@ -1,0 +1,199 @@
+{
+  "description": "Experiment L: Pretrained Mamba backbone cliff test. Tests whether the position cliff from Exp H transfers to a frozen pretrained Mamba-130M backbone with a trainable linear classifier head. 5 seeds x 9 positions = 5 training runs (one head-training per seed, evaluated at 9 positions).",
+  "experiment": "pretrained_mamba_cliff",
+  "model_id": "state-spaces/mamba-130m-hf",
+  "training_regime": "frozen backbone + trainable linear classifier head",
+  "scale": "pretrained_130M",
+  "n_seeds": 5,
+  "seeds": [
+    42,
+    137,
+    256,
+    789,
+    1024
+  ],
+  "positions_tested": [
+    0,
+    25,
+    50,
+    75,
+    80,
+    85,
+    90,
+    95,
+    100
+  ],
+  "runs": [
+    {
+      "seed": 42,
+      "arch": "pretrained_mamba_130m",
+      "clean_acc": 94.0,
+      "positions": {
+        "frac_0": {
+          "gap": -8.7
+        },
+        "frac_25": {
+          "gap": -0.3
+        },
+        "frac_50": {
+          "gap": -3.0
+        },
+        "frac_75": {
+          "gap": -4.3
+        },
+        "frac_80": {
+          "gap": -5.0
+        },
+        "frac_85": {
+          "gap": -5.7
+        },
+        "frac_90": {
+          "gap": -5.3
+        },
+        "frac_95": {
+          "gap": -5.3
+        },
+        "frac_100": {
+          "gap": -5.0
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "arch": "pretrained_mamba_130m",
+      "clean_acc": 94.33,
+      "positions": {
+        "frac_0": {
+          "gap": -30.0
+        },
+        "frac_25": {
+          "gap": 0.3
+        },
+        "frac_50": {
+          "gap": 0.0
+        },
+        "frac_75": {
+          "gap": -1.7
+        },
+        "frac_80": {
+          "gap": -1.3
+        },
+        "frac_85": {
+          "gap": -1.3
+        },
+        "frac_90": {
+          "gap": -1.0
+        },
+        "frac_95": {
+          "gap": -1.0
+        },
+        "frac_100": {
+          "gap": -1.0
+        }
+      }
+    },
+    {
+      "seed": 256,
+      "arch": "pretrained_mamba_130m",
+      "clean_acc": 95.0,
+      "positions": {
+        "frac_0": {
+          "gap": -38.3
+        },
+        "frac_25": {
+          "gap": -0.7
+        },
+        "frac_50": {
+          "gap": -3.7
+        },
+        "frac_75": {
+          "gap": -4.7
+        },
+        "frac_80": {
+          "gap": -4.3
+        },
+        "frac_85": {
+          "gap": -5.0
+        },
+        "frac_90": {
+          "gap": -6.0
+        },
+        "frac_95": {
+          "gap": -5.3
+        },
+        "frac_100": {
+          "gap": -4.3
+        }
+      }
+    },
+    {
+      "seed": 789,
+      "arch": "pretrained_mamba_130m",
+      "clean_acc": 90.0,
+      "positions": {
+        "frac_0": {
+          "gap": 0.0
+        },
+        "frac_25": {
+          "gap": -0.3
+        },
+        "frac_50": {
+          "gap": -1.0
+        },
+        "frac_75": {
+          "gap": -2.3
+        },
+        "frac_80": {
+          "gap": -2.3
+        },
+        "frac_85": {
+          "gap": -2.0
+        },
+        "frac_90": {
+          "gap": -2.3
+        },
+        "frac_95": {
+          "gap": -1.7
+        },
+        "frac_100": {
+          "gap": -1.0
+        }
+      }
+    },
+    {
+      "seed": 1024,
+      "arch": "pretrained_mamba_130m",
+      "clean_acc": 94.33,
+      "positions": {
+        "frac_0": {
+          "gap": -13.3
+        },
+        "frac_25": {
+          "gap": -2.7
+        },
+        "frac_50": {
+          "gap": -2.7
+        },
+        "frac_75": {
+          "gap": -3.3
+        },
+        "frac_80": {
+          "gap": -3.3
+        },
+        "frac_85": {
+          "gap": -3.7
+        },
+        "frac_90": {
+          "gap": -3.3
+        },
+        "frac_95": {
+          "gap": -3.0
+        },
+        "frac_100": {
+          "gap": -3.3
+        }
+      }
+    }
+  ],
+  "note": "Flat curve (no cliff) at positions 25-100%. Position 0% is noisy (std 15.7) due to edge effects at sequence start. Main finding: cliff does NOT transfer from Exp H from-scratch training to frozen backbone + linear probe setting. See paper Appendix L for interpretation."
+}

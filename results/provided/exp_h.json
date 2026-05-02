@@ -1,0 +1,686 @@
+{
+  "description": "Position ablation experiment (Experiment H): 9-position shortcut sweep",
+  "scale": "medium",
+  "n_seeds": 5,
+  "seeds": [
+    42,
+    137,
+    256,
+    789,
+    1024
+  ],
+  "positions_tested": [
+    0,
+    25,
+    50,
+    75,
+    80,
+    85,
+    90,
+    95,
+    100
+  ],
+  "note": "Shortcut inserted at fractional position of sequence. 0%=begin, 100%=end. Reveals sharp cliff: shortcuts at 0-90% harmless, 95%-100% catastrophic for sequential archs.",
+  "runs": [
+    {
+      "arch": "transformer",
+      "seed": 42,
+      "scale": "medium",
+      "clean_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_25": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_50": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_75": {
+          "gap": -0.7,
+          "short_acc": 99.3
+        },
+        "frac_80": {
+          "gap": -0.3,
+          "short_acc": 99.7
+        },
+        "frac_85": {
+          "gap": -0.3,
+          "short_acc": 99.7
+        },
+        "frac_90": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_95": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_100": {
+          "gap": -0.7,
+          "short_acc": 99.3
+        }
+      }
+    },
+    {
+      "arch": "transformer",
+      "seed": 137,
+      "scale": "medium",
+      "clean_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_25": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_50": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_75": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_80": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_85": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_90": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_95": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_100": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        }
+      }
+    },
+    {
+      "arch": "transformer",
+      "seed": 256,
+      "scale": "medium",
+      "clean_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_25": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_50": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_75": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_80": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_85": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_90": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_95": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_100": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        }
+      }
+    },
+    {
+      "arch": "transformer",
+      "seed": 789,
+      "scale": "medium",
+      "clean_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_25": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_50": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_75": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_80": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_85": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_90": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_95": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_100": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        }
+      }
+    },
+    {
+      "arch": "transformer",
+      "seed": 1024,
+      "scale": "medium",
+      "clean_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_25": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_50": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_75": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_80": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_85": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_90": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_95": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_100": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        }
+      }
+    },
+    {
+      "arch": "lstm",
+      "seed": 42,
+      "scale": "medium",
+      "clean_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_25": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_50": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_75": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_80": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_85": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_90": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_95": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_100": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        }
+      }
+    },
+    {
+      "arch": "lstm",
+      "seed": 137,
+      "scale": "medium",
+      "clean_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_25": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_50": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_75": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_80": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_85": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_90": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_95": {
+          "gap": -0.3,
+          "short_acc": 99.7
+        },
+        "frac_100": {
+          "gap": -1.7,
+          "short_acc": 98.3
+        }
+      }
+    },
+    {
+      "arch": "lstm",
+      "seed": 256,
+      "scale": "medium",
+      "clean_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_25": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_50": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_75": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_80": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_85": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_90": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_95": {
+          "gap": -5.0,
+          "short_acc": 95.0
+        },
+        "frac_100": {
+          "gap": -19.0,
+          "short_acc": 81.0
+        }
+      }
+    },
+    {
+      "arch": "lstm",
+      "seed": 789,
+      "scale": "medium",
+      "clean_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_25": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_50": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_75": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_80": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_85": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_90": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_95": {
+          "gap": -8.3,
+          "short_acc": 91.7
+        },
+        "frac_100": {
+          "gap": -16.3,
+          "short_acc": 83.7
+        }
+      }
+    },
+    {
+      "arch": "lstm",
+      "seed": 1024,
+      "scale": "medium",
+      "clean_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_25": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_50": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_75": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_80": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_85": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_90": {
+          "gap": -0.3,
+          "short_acc": 99.7
+        },
+        "frac_95": {
+          "gap": -7.7,
+          "short_acc": 92.3
+        },
+        "frac_100": {
+          "gap": -18.0,
+          "short_acc": 82.0
+        }
+      }
+    },
+    {
+      "arch": "mamba",
+      "seed": 42,
+      "scale": "medium",
+      "clean_acc": 99.67,
+      "positions": {
+        "frac_0": {
+          "gap": 0.0,
+          "short_acc": 99.67
+        },
+        "frac_25": {
+          "gap": -0.3,
+          "short_acc": 99.37
+        },
+        "frac_50": {
+          "gap": -0.3,
+          "short_acc": 99.37
+        },
+        "frac_75": {
+          "gap": 0.0,
+          "short_acc": 99.67
+        },
+        "frac_80": {
+          "gap": -1.0,
+          "short_acc": 98.67
+        },
+        "frac_85": {
+          "gap": -0.3,
+          "short_acc": 99.37
+        },
+        "frac_90": {
+          "gap": -0.3,
+          "short_acc": 99.37
+        },
+        "frac_95": {
+          "gap": -2.0,
+          "short_acc": 97.67
+        },
+        "frac_100": {
+          "gap": -8.3,
+          "short_acc": 91.37
+        }
+      }
+    },
+    {
+      "arch": "mamba",
+      "seed": 137,
+      "scale": "medium",
+      "clean_acc": 98.0,
+      "positions": {
+        "frac_0": {
+          "gap": 2.0,
+          "short_acc": 100.0
+        },
+        "frac_25": {
+          "gap": 1.3,
+          "short_acc": 99.3
+        },
+        "frac_50": {
+          "gap": 2.0,
+          "short_acc": 100.0
+        },
+        "frac_75": {
+          "gap": 1.3,
+          "short_acc": 99.3
+        },
+        "frac_80": {
+          "gap": 0.3,
+          "short_acc": 98.3
+        },
+        "frac_85": {
+          "gap": 0.3,
+          "short_acc": 98.3
+        },
+        "frac_90": {
+          "gap": 1.0,
+          "short_acc": 99.0
+        },
+        "frac_95": {
+          "gap": -1.0,
+          "short_acc": 97.0
+        },
+        "frac_100": {
+          "gap": -4.7,
+          "short_acc": 93.3
+        }
+      }
+    },
+    {
+      "arch": "mamba",
+      "seed": 256,
+      "scale": "medium",
+      "clean_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "gap": -0.3,
+          "short_acc": 99.7
+        },
+        "frac_25": {
+          "gap": -0.7,
+          "short_acc": 99.3
+        },
+        "frac_50": {
+          "gap": -0.7,
+          "short_acc": 99.3
+        },
+        "frac_75": {
+          "gap": -1.0,
+          "short_acc": 99.0
+        },
+        "frac_80": {
+          "gap": -0.7,
+          "short_acc": 99.3
+        },
+        "frac_85": {
+          "gap": -0.7,
+          "short_acc": 99.3
+        },
+        "frac_90": {
+          "gap": -0.7,
+          "short_acc": 99.3
+        },
+        "frac_95": {
+          "gap": -3.7,
+          "short_acc": 96.3
+        },
+        "frac_100": {
+          "gap": -14.3,
+          "short_acc": 85.7
+        }
+      }
+    },
+    {
+      "arch": "mamba",
+      "seed": 789,
+      "scale": "medium",
+      "clean_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_25": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_50": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_75": {
+          "gap": -0.3,
+          "short_acc": 99.7
+        },
+        "frac_80": {
+          "gap": -0.3,
+          "short_acc": 99.7
+        },
+        "frac_85": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_90": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_95": {
+          "gap": -6.0,
+          "short_acc": 94.0
+        },
+        "frac_100": {
+          "gap": -14.0,
+          "short_acc": 86.0
+        }
+      }
+    },
+    {
+      "arch": "mamba",
+      "seed": 1024,
+      "scale": "medium",
+      "clean_acc": 100.0,
+      "positions": {
+        "frac_0": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_25": {
+          "gap": -0.3,
+          "short_acc": 99.7
+        },
+        "frac_50": {
+          "gap": -0.3,
+          "short_acc": 99.7
+        },
+        "frac_75": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_80": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_85": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_90": {
+          "gap": 0.0,
+          "short_acc": 100.0
+        },
+        "frac_95": {
+          "gap": -3.7,
+          "short_acc": 96.3
+        },
+        "frac_100": {
+          "gap": -11.3,
+          "short_acc": 88.7
+        }
+      }
+    }
+  ]
+}
