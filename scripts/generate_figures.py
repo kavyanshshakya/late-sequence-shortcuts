@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-"""Generate all publication figures from JSON result files.
+"""Generate all 14 figures from JSON result files.
 
-Reads pre-computed data from results/provided/exp_{a..k}.json and writes
-matplotlib-rendered PDFs to paper/. Run after results have been regenerated
-or to re-style existing figures without re-running experiments.
+Data priority: for each experiment, tries results/<exp>.json first (your
+fresh runs), then falls back to results/provided/<exp>.json (canonical).
+Only generates figures whose JSON data is available; skips the rest with
+a warning.
 
-Figures for Experiments L, M, and P are produced by their own standalone scripts:
-  - ext_pretrained_mamba_cliff.py produces fig_pretrained.pdf (Experiment L)
-  - ext_state_probing_v2.py produces fig_repr_cliff.pdf (Experiment M)
-  - exp_p_cliff_emergence.py produces fig_cliff_emergence.pdf (Experiment P)
+Writes matplotlib-rendered PDFs to figures/ at the repo root.
 """
 
 import os, sys, json, numpy as np, matplotlib
@@ -17,19 +15,39 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.ticker import MultipleLocator
 import matplotlib.font_manager as fm
+from collections import defaultdict
 
 # =====================================================================
 # PATHS
 # =====================================================================
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT  = os.path.dirname(SCRIPT_DIR)
-RESULT_DIR = os.path.join(REPO_ROOT, "results", "provided")
+RESULT_DIR_FRESH    = os.path.join(REPO_ROOT, "results")
+RESULT_DIR_PROVIDED = os.path.join(REPO_ROOT, "results", "provided")
 OUTPUT_DIR = os.path.join(REPO_ROOT, "figures")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
+
 def load(name):
-    with open(os.path.join(RESULT_DIR, f"{name}.json")) as f:
-        return json.load(f)
+    """Load experiment JSON with per-file fallback.
+
+    For each experiment, tries results/<name>.json first (fresh runs),
+    then falls back to results/provided/<name>.json (canonical results
+    that ship with the repo). Returns the parsed JSON dict, or None if
+    neither location has the file (in which case the corresponding
+    figure will be skipped with a warning).
+
+    This means a user who re-runs only a subset of experiments
+    (e.g. exp_i.py) will see those figures rebuilt from fresh data
+    while the remaining figures continue to use canonical results.
+    """
+    fresh    = os.path.join(RESULT_DIR_FRESH,    f"{name}.json")
+    provided = os.path.join(RESULT_DIR_PROVIDED, f"{name}.json")
+    for path in (fresh, provided):
+        if os.path.exists(path):
+            with open(path) as f:
+                return json.load(f)
+    return None
 
 # =====================================================================
 # STYLE SYSTEM  (identical to hardcoded version)
@@ -127,64 +145,121 @@ ea = load("exp_a"); eb = load("exp_b"); ec = load("exp_c")
 ed = load("exp_d"); ee = load("exp_e"); ef = load("exp_f")
 eg = load("exp_g"); eh = load("exp_h")
 
+# Print availability summary at startup
+def _origin(name):
+    """Where did this experiment's data come from?"""
+    fresh = os.path.join(RESULT_DIR_FRESH, f"{name}.json")
+    provided = os.path.join(RESULT_DIR_PROVIDED, f"{name}.json")
+    if os.path.exists(fresh):    return "fresh"
+    if os.path.exists(provided): return "provided"
+    return None
+
+_core = {"a": ea, "b": eb, "c": ec, "d": ed,
+         "e": ee, "f": ef, "g": eg, "h": eh}
+_avail   = [n for n, d in _core.items() if d is not None]
+_missing = [n for n, d in _core.items() if d is None]
+_origins = {n: _origin(f"exp_{n}") for n in _core}
+_n_fresh    = sum(1 for v in _origins.values() if v == "fresh")
+_n_provided = sum(1 for v in _origins.values() if v == "provided")
+
+print("Data source: results/ (fresh) takes priority, falls back to results/provided/")
+print(f"  fresh runs:    {_n_fresh}/8 core experiments")
+print(f"  canonical:     {_n_provided}/8 core experiments")
+if _missing:
+    print(f"  missing:       {_missing} -> dependent figures will skip")
+print()
+
 seeds_5 = [42, 137, 256, 789, 1024]
 seeds_3 = [42, 137, 256]
 
-# Exp A gaps
-sm_trans = _gaps(ea, "transformer"); sm_lstm = _gaps(ea, "lstm"); sm_mamba = _gaps(ea, "mamba")
-# Exp B gaps
-md_trans = _gaps(eb, "transformer"); md_lstm = _gaps(eb, "lstm"); md_mamba = _gaps(eb, "mamba")
+# Conditionally extract data - only if the source experiment is available.
+# Each block sets module-level variables; figure functions check for None
+# and skip if their dependency is missing.
 
-# Exp C
-pe_sm = [r["gap"] for r in ec["runs"] if r["scale"]=="small"]
-pe_md = [r["gap"] for r in ec["runs"] if r["scale"]=="medium"]
-reg_sm_3 = [_gaps_by_seed(ea, "mamba", seeds_3, "gap")[i] for i in range(3)]
-reg_md_3 = [_gaps_by_seed(eb, "mamba", seeds_3, "gap")[i] for i in range(3)]
+# Exp A
+if ea is not None:
+    sm_trans = _gaps(ea, "transformer"); sm_lstm = _gaps(ea, "lstm"); sm_mamba = _gaps(ea, "mamba")
+else:
+    sm_trans = sm_lstm = sm_mamba = None
+
+# Exp B
+if eb is not None:
+    md_trans = _gaps(eb, "transformer"); md_lstm = _gaps(eb, "lstm"); md_mamba = _gaps(eb, "mamba")
+else:
+    md_trans = md_lstm = md_mamba = None
+
+# Exp C - depends on A, B, C
+if ec is not None and ea is not None and eb is not None:
+    pe_sm = [r["gap"] for r in ec["runs"] if r["scale"]=="small"]
+    pe_md = [r["gap"] for r in ec["runs"] if r["scale"]=="medium"]
+    reg_sm_3 = [_gaps_by_seed(ea, "mamba", seeds_3, "gap")[i] for i in range(3)]
+    reg_md_3 = [_gaps_by_seed(eb, "mamba", seeds_3, "gap")[i] for i in range(3)]
+else:
+    pe_sm = pe_md = reg_sm_3 = reg_md_3 = None
 
 # Exp D
-def _d_gaps(model, scale):
-    return [r["gap"] for r in ed["runs"] if r["model"]==model and r["scale"]==scale]
-m1_sm = _d_gaps("mamba1","small"); m1_md = _d_gaps("mamba1","medium")
-m2_sm = _d_gaps("mamba2","small"); m2_md = _d_gaps("mamba2","medium"); m2_lg = _d_gaps("mamba2","large")
+if ed is not None:
+    def _d_gaps(model, scale):
+        return [r["gap"] for r in ed["runs"] if r["model"]==model and r["scale"]==scale]
+    m1_sm = _d_gaps("mamba1","small"); m1_md = _d_gaps("mamba1","medium")
+    m2_sm = _d_gaps("mamba2","small"); m2_md = _d_gaps("mamba2","medium"); m2_lg = _d_gaps("mamba2","large")
+else:
+    m1_sm = m1_md = m2_sm = m2_md = m2_lg = None
 
 # Exp E
-sc_trans = _gaps(ee, "transformer"); sc_lstm = _gaps(ee, "lstm"); sc_mamba = _gaps(ee, "mamba")
+if ee is not None:
+    sc_trans = _gaps(ee, "transformer"); sc_lstm = _gaps(ee, "lstm"); sc_mamba = _gaps(ee, "mamba")
+else:
+    sc_trans = sc_lstm = sc_mamba = None
 
 # Exp F
-f_trans = [r["short_only"] for r in ef["runs"] if r["arch"]=="transformer"]
-f_lstm  = [r["short_only"] for r in ef["runs"] if r["arch"]=="lstm"]
-f_mamba = [r["short_only"] for r in ef["runs"] if r["arch"]=="mamba"]
+if ef is not None:
+    f_trans = [r["short_only"] for r in ef["runs"] if r["arch"]=="transformer"]
+    f_lstm  = [r["short_only"] for r in ef["runs"] if r["arch"]=="lstm"]
+    f_mamba = [r["short_only"] for r in ef["runs"] if r["arch"]=="mamba"]
+else:
+    f_trans = f_lstm = f_mamba = None
 
 # Exp G
-g_true2move_trans = [r["short_acc"] for r in eg["true_2move_results"] if r["arch"]=="transformer"]
-g_true2move_lstm  = [r["short_acc"] for r in eg["true_2move_results"] if r["arch"]=="lstm"]
-g_true2move_mamba = [r["short_acc"] for r in eg["true_2move_results"] if r["arch"]=="mamba"]
+if eg is not None:
+    g_true2move_trans = [r["short_acc"] for r in eg["true_2move_results"] if r["arch"]=="transformer"]
+    g_true2move_lstm  = [r["short_acc"] for r in eg["true_2move_results"] if r["arch"]=="lstm"]
+    g_true2move_mamba = [r["short_acc"] for r in eg["true_2move_results"] if r["arch"]=="mamba"]
+else:
+    g_true2move_trans = g_true2move_lstm = g_true2move_mamba = None
 
 # Exp H: 9-position sweep. New JSON uses positions dict.
 # Positions tested: 0, 25, 50, 75, 80, 85, 90, 95, 100 (% of sequence)
-H_POSITIONS = eh["positions_tested"]  # e.g., [0, 25, 50, 75, 80, 85, 90, 95, 100]
+if eh is not None:
+    H_POSITIONS = eh["positions_tested"]
 
-def _h_gaps(arch):
-    """Return dict {position: [gaps across seeds]} for given arch."""
-    out = {p: [] for p in H_POSITIONS}
-    for r in eh["runs"]:
-        if r["arch"] != arch:
-            continue
-        for p in H_POSITIONS:
-            out[p].append(r["positions"][f"frac_{p}"]["gap"])
-    return out
+    def _h_gaps(arch):
+        """Return dict {position: [gaps across seeds]} for given arch."""
+        out = {p: [] for p in H_POSITIONS}
+        for r in eh["runs"]:
+            if r["arch"] != arch:
+                continue
+            for p in H_POSITIONS:
+                out[p].append(r["positions"][f"frac_{p}"]["gap"])
+        return out
 
-h_trans_pos = _h_gaps("transformer")
-h_lstm_pos  = _h_gaps("lstm")
-h_mamba_pos = _h_gaps("mamba")
+    h_trans_pos = _h_gaps("transformer")
+    h_lstm_pos  = _h_gaps("lstm")
+    h_mamba_pos = _h_gaps("mamba")
 
-# Legacy variables used by fig03/fig07 for endpoints (kept for compatibility)
-h_trans_end = h_trans_pos[100]
-h_trans_beg = h_trans_pos[0]
-h_lstm_end  = h_lstm_pos[100]
-h_lstm_beg  = h_lstm_pos[0]
-h_mamba_end = h_mamba_pos[100]
-h_mamba_beg = h_mamba_pos[0]
+    # Legacy variables used by fig03/fig07 for endpoints (kept for compatibility)
+    h_trans_end = h_trans_pos[100]
+    h_trans_beg = h_trans_pos[0]
+    h_lstm_end  = h_lstm_pos[100]
+    h_lstm_beg  = h_lstm_pos[0]
+    h_mamba_end = h_mamba_pos[100]
+    h_mamba_beg = h_mamba_pos[0]
+else:
+    H_POSITIONS = None
+    h_trans_pos = h_lstm_pos = h_mamba_pos = None
+    h_trans_end = h_trans_beg = None
+    h_lstm_end  = h_lstm_beg  = None
+    h_mamba_end = h_mamba_beg = None
 
 # Training dynamics (not in JSON; hardcoded supplementary data)
 lstm_bimodal_epochs = [1, 5, 10, 15, 20, 25, 30, 35, 40]
@@ -203,6 +278,9 @@ magic_s42_gaps    = [-2.67, -2.67, -11.33, -12.00, -14.33, -14.33, -14.67, -14.3
 def fig01():
     """Cliff curve (Exp H, 9-position): hero figure showing disruption
     concentrates in final 10% of sequence."""
+    if eh is None:
+        print("  SKIP (no exp_h.json found)")
+        return False
     fig, ax = plt.subplots(figsize=(7.0, 3.5), constrained_layout=True)
 
     # Compute means and stds per position for each arch
@@ -262,6 +340,9 @@ def fig01():
 # FIGURE 2: Main Robustness Hierarchy (Exp A + B)
 # =====================================================================
 def fig02():
+    if ea is None or eb is None:
+        print("  SKIP (need exp_a + exp_b)")
+        return False
     fig, axes = plt.subplots(1, 2, figsize=(7.0, 3.0), sharey=True, constrained_layout=True)
     for ax, data, label in [
         (axes[0], [sm_trans, sm_lstm, sm_mamba], "A"),
@@ -296,6 +377,9 @@ def fig02():
 # FIGURE 3: Per-Scenario Breakdown (Exp G)
 # =====================================================================
 def fig03():
+    if eg is None or eh is None:
+        print("  SKIP (need exp_g + exp_h)")
+        return False
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(7.0, 3.4), constrained_layout=True,
                                    gridspec_kw={"width_ratios": [3, 2]})
     types_labels = ["2-move\nFB", "3-move\nFB", "2nd\norder", "Classic\nFB", "True\nbelief"]
@@ -359,6 +443,9 @@ def fig03():
 # FIGURE 4: Scale Invariance (Exp D)
 # =====================================================================
 def fig04():
+    if ea is None or eb is None or ed is None:
+        print("  SKIP (need exp_a + exp_b + exp_d)")
+        return False
     fig, ax = plt.subplots(figsize=(7.0, 3.2), constrained_layout=True)
     scales_x = np.array([0, 1, 2])
 
@@ -401,6 +488,9 @@ def fig04():
 # FIGURE 5: Training Condition (Exp E)
 # =====================================================================
 def fig05():
+    if ee is None:
+        print("  SKIP (no exp_e.json found)")
+        return False
     fig, axes = plt.subplots(1, 2, figsize=(7.0, 3.0), sharey=True, constrained_layout=True)
     colors = [STYLE["trans"], STYLE["lstm"], STYLE["mamba"]]
     dk = [STYLE["trans_dk"], STYLE["lstm_dk"], STYLE["mamba_dk"]]
@@ -444,6 +534,9 @@ def fig05():
 # FIGURE 6: PosEnc Ablation (Exp C)
 # =====================================================================
 def fig06():
+    if ec is None or ea is None or eb is None:
+        print("  SKIP (need exp_c + exp_a + exp_b)")
+        return False
     fig, axes = plt.subplots(1, 2, figsize=(7.0, 3.0), sharey=True, constrained_layout=True)
     for ax, reg, pe, label, title in [
         (axes[0], reg_sm_3, pe_sm, "A", "Small scale"),
@@ -480,29 +573,48 @@ def fig06():
 # FIGURE 7: Per-Seed Breakdown (Exp B)
 # =====================================================================
 def fig07():
-    fig, ax = plt.subplots(figsize=(3.5, 3.5), constrained_layout=True)
+    if eb is None:
+        print("  SKIP (no exp_b.json found)")
+        return False
+    # Match paper: solid lines, filled markers, legend below the plot,
+    # annotation pointing to the robust LSTM seed at 256.
+    fig, ax = plt.subplots(figsize=(7.0, 3.6), constrained_layout=True)
+
+    # Compute ranges for legend labels
     lstm_min, lstm_max = min(md_lstm), max(md_lstm)
     mamba_min, mamba_max = min(md_mamba), max(md_mamba)
-    ax.fill_between(seeds_5, lstm_min, lstm_max, alpha=0.12, color=STYLE["lstm"], linewidth=0, zorder=1)
-    ax.fill_between(seeds_5, mamba_min, mamba_max, alpha=0.12, color=STYLE["mamba"], linewidth=0, zorder=1)
-    ax.plot(seeds_5, md_trans, "-",  color=STYLE["trans"], lw=2.0,
-            marker="s", markersize=6.5, markerfacecolor="white",
-            markeredgecolor=STYLE["trans"], markeredgewidth=1.6, label="Transformer", zorder=5)
-    ax.plot(seeds_5, md_lstm,  "--", color=STYLE["lstm"], lw=1.8,
-            marker="o", markersize=6.5, markerfacecolor="white",
-            markeredgecolor=STYLE["lstm"], markeredgewidth=1.6, label="LSTM", zorder=4)
-    ax.plot(seeds_5, md_mamba, ":",  color=STYLE["mamba"], lw=1.8,
-            marker="^", markersize=6.5, markerfacecolor="white",
-            markeredgecolor=STYLE["mamba"], markeredgewidth=1.6, label="Mamba", zorder=4)
-    ax.set_xlabel("Random seed", fontsize=10); ax.set_ylabel("Shortcut gap (%)", fontsize=10)
-    ax.set_xticks(seeds_5); ax.set_xticklabels(["42","137","256","789","1024"], fontsize=8)
+
+    # Canonical marker convention: Transformer="o", LSTM="s", Mamba="^"
+    ax.plot(seeds_5, md_trans, "-", color=STYLE["trans"], lw=2.2,
+            marker="o", markersize=10, markerfacecolor=STYLE["trans"],
+            markeredgecolor=STYLE["trans"], markeredgewidth=1.0,
+            label="Transformer (0% gap)", zorder=5)
+    ax.plot(seeds_5, md_lstm, "-", color=STYLE["lstm"], lw=2.2,
+            marker="s", markersize=10, markerfacecolor=STYLE["lstm"],
+            markeredgecolor=STYLE["lstm"], markeredgewidth=1.0,
+            label=f"LSTM (range: {lstm_max:.1f} to {lstm_min:.1f}%)", zorder=4)
+    ax.plot(seeds_5, md_mamba, "-", color=STYLE["mamba"], lw=2.2,
+            marker="^", markersize=10, markerfacecolor=STYLE["mamba"],
+            markeredgecolor=STYLE["mamba"], markeredgewidth=1.0,
+            label=f"Mamba (range: {mamba_max:.1f} to {mamba_min:.1f}%)", zorder=4)
+
+    ax.axhline(0, color=STYLE["subtext"], lw=0.8, ls=":", zorder=2)
+    ax.set_xlabel("Random seed", fontsize=10)
+    ax.set_ylabel("Shortcut gap (%)", fontsize=10)
+    ax.set_xticks(seeds_5)
+    ax.set_xticklabels(["42", "137", "256", "789", "1024"], fontsize=9)
     ax.set_ylim(-22, 4)
-    ax.axhline(0, color=STYLE["subtext"], lw=0.8, ls="--", zorder=2)
-    ax.legend(frameon=True, fontsize=7, loc="upper center", ncol=3, bbox_to_anchor=(0.5, 0.99))
-    _annot(ax, "LSTM: bimodal,\nMamba: tight cluster",
-           xy=(256, 0), xytext=(600, -4), color=STYLE["lstm_dk"], fontsize=7.5, rad=-0.2)
+    ax.set_xlim(-30, 1100)
+    # Annotation removed per user feedback - legend ranges already convey
+    # "LSTM has a robust seed (range starts at 0.0)".
+
+    # Legend below the plot
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.18),
+              ncol=3, frameon=False, fontsize=8.5, handlelength=2.5)
+
+    ax.set_title("Per-seed shortcut gap (Experiment B, medium scale)",
+                 fontsize=10.5, fontweight="bold")
     _style_ax(ax, grid_axis="y")
-    ax.set_title("Per-seed analysis (medium scale)", fontsize=10, fontweight="bold")
     save(fig, "fig7_per_seed.pdf")
 
 
@@ -510,6 +622,9 @@ def fig07():
 # FIGURE 8: Shortcut-Only Baseline (Exp F)
 # =====================================================================
 def fig08():
+    if ef is None:
+        print("  SKIP (no exp_f.json found)")
+        return False
     fig, ax = plt.subplots(figsize=(3.5, 3.2), constrained_layout=True)
     means = [np.mean(f_trans), np.mean(f_lstm), np.mean(f_mamba)]
     stds  = [np.std(f_trans, ddof=1), np.std(f_lstm, ddof=1), np.std(f_mamba, ddof=1)]
@@ -537,29 +652,46 @@ def fig08():
 # FIGURE 9: LSTM Bimodality Training Dynamics
 # =====================================================================
 def fig09():
-    fig, ax = plt.subplots(figsize=(3.5, 3.2), constrained_layout=True)
-    ax.fill_between([5, 10], -22, 4, alpha=0.08, color=STYLE["mamba_dk"], linewidth=0, zorder=1)
-    ax.text(7.5, 3, "critical window", fontsize=7, color=STYLE["mamba_dk"],
+    # Match paper: solid lines, end-of-line value labels, "Seed N (label)" legend.
+    # No annotation box (per user request - was overlapping/cluttering).
+    fig, ax = plt.subplots(figsize=(7.0, 3.6), constrained_layout=True)
+
+    # Critical window shaded zone
+    ax.fill_between([5, 10], -22, 4, alpha=0.10, color=STYLE["mamba_dk"],
+                    linewidth=0, zorder=1)
+    ax.text(7.5, 2.8, "critical window", fontsize=8.5, color=STYLE["mamba_dk"],
             fontstyle="italic", fontweight="bold", ha="center")
+
+    # Two-tone "robust vs fragile" palette using Wong colorblind-safe colors,
+    # complementing the main paper figs: deep blue = robust, vermillion = fragile.
+    ROBUST_COLOR  = "#0072B2"   # deep blue
+    FRAGILE_COLOR = "#D55E00"   # vermillion
     ax.plot(lstm_bimodal_epochs, lstm_s256_gap_over_time, "-",
-            color="#228833", lw=2.0, marker="o", markersize=5.5,
-            markerfacecolor="white", markeredgecolor="#228833", markeredgewidth=1.6,
-            label="s256 (robust, 0.0%)", zorder=5)
-    ax.plot(lstm_bimodal_epochs, lstm_s789_gap_over_time, "--",
-            color=STYLE["lstm"], lw=1.8, marker="s", markersize=5.5,
-            markerfacecolor="white", markeredgecolor=STYLE["lstm"], markeredgewidth=1.6,
-            label="s789 (fragile, -18.3%)", zorder=4)
-    ax.text(40, lstm_s256_gap_over_time[-1] + 1.5, f"{lstm_s256_gap_over_time[-1]:.1f}%",
-            ha="left", fontsize=7.5, color="#228833", fontweight="bold")
-    ax.text(40, lstm_s789_gap_over_time[-1] - 1.5, f"{lstm_s789_gap_over_time[-1]:.1f}%",
-            ha="left", fontsize=7.5, color=STYLE["lstm"], fontweight="bold")
+            color=ROBUST_COLOR, lw=2.4, marker="o", markersize=8,
+            markerfacecolor="white", markeredgecolor=ROBUST_COLOR, markeredgewidth=1.8,
+            label="Seed 256 (robust: 0.0%)", zorder=5)
+    ax.plot(lstm_bimodal_epochs, lstm_s789_gap_over_time, "-",
+            color=FRAGILE_COLOR, lw=2.4, marker="s", markersize=8,
+            markerfacecolor="white", markeredgecolor=FRAGILE_COLOR, markeredgewidth=1.8,
+            label="Seed 789 (fragile: -18.3%)", zorder=4)
+
+    # End-of-line value labels
+    ax.text(41, lstm_s256_gap_over_time[-1], f"{lstm_s256_gap_over_time[-1]:.1f}%",
+            ha="left", va="center", fontsize=9, color=ROBUST_COLOR, fontweight="bold")
+    ax.text(41, lstm_s789_gap_over_time[-1], f"{lstm_s789_gap_over_time[-1]:.1f}%",
+            ha="left", va="center", fontsize=9, color=FRAGILE_COLOR, fontweight="bold")
+
     ax.axhline(0, color=STYLE["subtext"], lw=0.8, ls=":", zorder=2)
-    _annot(ax, "Fate decided in 5 epochs:\nrobust vs fragile is permanent",
-           xy=(10, -18.0), xytext=(21.25, -13.0), color=STYLE["mamba_dk"], fontsize=7.5, rad=-0.2)
-    ax.set_xlabel("Epoch", fontsize=10); ax.set_ylabel("Shortcut gap (%)", fontsize=10)
-    ax.set_ylim(-22, 4); ax.set_xticks(lstm_bimodal_epochs)
-    ax.legend(loc="center right", fontsize=7, frameon=True, bbox_to_anchor=(0.98, 0.55))
-    ax.set_title("LSTM bimodality (medium scale)", fontsize=10, fontweight="bold")
+
+    ax.set_xlabel("Training epoch", fontsize=10)
+    ax.set_ylabel("Shortcut gap (%)", fontsize=10)
+    ax.set_ylim(-22, 4)
+    ax.set_xticks(lstm_bimodal_epochs)
+    ax.set_xlim(0, 44)
+    ax.legend(loc="center right", fontsize=9, frameon=True,
+              bbox_to_anchor=(0.95, 0.5))
+    ax.set_title("LSTM training dynamics: bimodal divergence",
+                 fontsize=10.5, fontweight="bold")
     _style_ax(ax, grid_axis="y")
     save(fig, "fig9_lstm_bimodality.pdf")
 
@@ -568,47 +700,419 @@ def fig09():
 # FIGURE 10: Magic Seed Training Dynamics
 # =====================================================================
 def fig10():
-    fig, ax = plt.subplots(figsize=(3.5, 3.2), constrained_layout=True)
-    ax.fill_between([5, 10], -18, 4, alpha=0.08, color=STYLE["mamba_dk"], linewidth=0, zorder=1)
-    ax.text(7.5, 2.5, "critical window", fontsize=7, color=STYLE["mamba_dk"],
+    # Match paper: solid lines, "Only 1 of 18 Mamba runs..." annotation positioned
+    # in lower part of plot to avoid overlapping the line trajectories.
+    fig, ax = plt.subplots(figsize=(7.0, 3.6), constrained_layout=True)
+
+    # Critical window
+    ax.fill_between([5, 10], -18, 4, alpha=0.10, color=STYLE["mamba_dk"],
+                    linewidth=0, zorder=1)
+    ax.text(7.5, 2.8, "critical window", fontsize=8.5, color=STYLE["mamba_dk"],
             fontstyle="italic", fontweight="bold", ha="center")
+
+    # Two-tone "robust vs fragile" palette (same as fig9 for consistency)
+    ROBUST_COLOR  = "#0072B2"   # deep blue
+    FRAGILE_COLOR = "#D55E00"   # vermillion
     ax.plot(magic_s256_epochs, magic_s256_gaps, "-",
-            color="#228833", lw=2.0, marker="o", markersize=5.5,
-            markerfacecolor="white", markeredgecolor="#228833", markeredgewidth=1.6,
-            label="s256 (magic, 0.0%)", zorder=5)
-    ax.plot(magic_s42_epochs, magic_s42_gaps, "--",
-            color=STYLE["mamba"], lw=1.8, marker="^", markersize=5.5,
-            markerfacecolor="white", markeredgecolor=STYLE["mamba"], markeredgewidth=1.6,
-            label="s42 (fragile, -13.7%)", zorder=4)
-    ax.text(45, magic_s256_gaps[-1] + 0.8, f"{magic_s256_gaps[-1]:.1f}%",
-            ha="right", fontsize=7.5, color="#228833", fontweight="bold")
-    ax.text(41, magic_s42_gaps[-1] - 1.2, f"{magic_s42_gaps[-1]:.1f}%",
-            ha="left", fontsize=7.5, color=STYLE["mamba"], fontweight="bold")
+            color=ROBUST_COLOR, lw=2.4, marker="o", markersize=8,
+            markerfacecolor="white", markeredgecolor=ROBUST_COLOR, markeredgewidth=1.8,
+            label="Seed 256 (magic, robust: 0.0%)", zorder=5)
+    ax.plot(magic_s42_epochs, magic_s42_gaps, "-",
+            color=FRAGILE_COLOR, lw=2.4, marker="s", markersize=8,
+            markerfacecolor="white", markeredgecolor=FRAGILE_COLOR, markeredgewidth=1.8,
+            label="Seed 42 (fragile, -13.7%)", zorder=4)
+
+    # End labels
+    ax.text(46, magic_s256_gaps[-1], f"{magic_s256_gaps[-1]:.1f}%",
+            ha="left", va="center", fontsize=9, color=ROBUST_COLOR, fontweight="bold")
+    ax.text(41, magic_s42_gaps[-1], f"{magic_s42_gaps[-1]:.1f}%",
+            ha="left", va="center", fontsize=9, color=FRAGILE_COLOR, fontweight="bold")
+
     ax.axhline(0, color=STYLE["subtext"], lw=0.8, ls=":", zorder=2)
-    _annot(ax, "1 in 18 Mamba seeds\nfinds the robust minimum",
-           xy=(10, 0.33), xytext=(17, -4), color=STYLE["mamba_dk"], fontsize=7.5, rad=-0.2)
-    ax.set_xlabel("Epoch", fontsize=10); ax.set_ylabel("Shortcut gap (%)", fontsize=10)
-    ax.set_ylim(-18, 4); ax.set_xticks([1, 5, 10, 15, 20, 25, 30, 35, 40, 45])
-    ax.legend(loc="center right", fontsize=7, frameon=True, bbox_to_anchor=(0.98, 0.45))
-    ax.set_title("Magic seed: Mamba-1 small", fontsize=10, fontweight="bold")
+
+    # Annotation box positioned in MIDDLE-UPPER region (y=-5), arrow pointing UP
+    # to the robust point at (10, 0.33). User feedback: move slightly up the y-axis.
+    ax.annotate("Only 1 of 18 Mamba runs\nfinds a robust minimum",
+                xy=(10, 0.33), xytext=(20, -5),
+                fontsize=8.5, color=ROBUST_COLOR, fontstyle="italic",
+                ha="center",
+                arrowprops=dict(arrowstyle="->", color=ROBUST_COLOR,
+                                lw=1.0, connectionstyle="arc3,rad=-0.25"),
+                bbox=dict(boxstyle="round,pad=0.4", fc="white",
+                          ec=ROBUST_COLOR, alpha=0.95, linewidth=0.8),
+                zorder=10)
+
+    ax.set_xlabel("Training epoch", fontsize=10)
+    ax.set_ylabel("Shortcut gap (%)", fontsize=10)
+    ax.set_ylim(-18, 4)
+    ax.set_xticks([1, 5, 10, 15, 20, 25, 30, 35, 40, 45])
+    ax.set_xlim(0, 49)
+    ax.legend(loc="center right", fontsize=9, frameon=True,
+              bbox_to_anchor=(0.95, 0.5))
+    ax.set_title("Mamba-1 training dynamics: 1 of 18 seeds finds robustness",
+                 fontsize=10.5, fontweight="bold")
     _style_ax(ax, grid_axis="y")
     save(fig, "fig10_magic_seed.pdf")
+
+
+# =====================================================================
+# FIGURE 11: Correlation Strength Ablation (Experiment I)
+# =====================================================================
+def fig11():
+    data = load("exp_i")
+    runs = data["runs"]
+    correlations = data["correlations"]  # [0.5, 0.7, 0.9]
+    archs = ["transformer", "lstm", "mamba"]
+
+    from collections import defaultdict
+    agg = defaultdict(list)
+    for r in runs:
+        agg[(r["arch"], r["correlation"])].append(r["gap"])
+
+    means = {a: np.array([np.mean(agg[(a, c)]) for c in correlations]) for a in archs}
+    stds  = {a: np.array([np.std(agg[(a, c)], ddof=1) if len(agg[(a, c)]) > 1 else 0
+                          for c in correlations]) for a in archs}
+
+    fig, ax = plt.subplots(figsize=(7.0, 3.8), constrained_layout=True)
+
+    x_pct = [int(c * 100) for c in correlations]
+
+    # Chance region: very subtle grey rectangle from 49 to 60 (covers x=50 area)
+    ax.fill_betweenx([-18, 1], 49, 60, alpha=0.10,
+                     color=STYLE["chance"], linewidth=0, zorder=1)
+    # "chance region" label centered horizontally and vertically inside the band.
+    # Band spans x=[49, 60] and y=[-18, 1] - centre is x=54.5, y=-8.5.
+    ax.text(54.5, -8.5, "chance\nregion", ha="center", va="center",
+            fontsize=8.5, color=STYLE["subtext"], fontstyle="italic")
+
+    # Canonical markers: Transformer="o", LSTM="s", Mamba="^"
+    arch_cfg = [
+        ("transformer", STYLE["trans"], "o", "Transformer"),
+        ("lstm",        STYLE["lstm"],  "s", "LSTM"),
+        ("mamba",       STYLE["mamba"], "^", "Mamba"),
+    ]
+    # Plot in z-order so Mamba (most extreme) is on top
+    for arch, color, marker, label in arch_cfg:
+        m = means[arch]
+        s = stds[arch]
+        # Filled error band
+        ax.fill_between(x_pct, m - s, m + s, alpha=0.18, color=color,
+                        linewidth=0, zorder=2)
+        # Line + open markers + error bars
+        ax.errorbar(x_pct, m, yerr=s, fmt=f"-{marker}", color=color, lw=2.2,
+                    markersize=8, markerfacecolor="white", markeredgecolor=color,
+                    markeredgewidth=1.6, capsize=4, capthick=1.0,
+                    elinewidth=1.0, ecolor=color, label=label, zorder=5)
+
+    # Zero line on top
+    ax.axhline(0, color=STYLE["subtext"], lw=0.8, ls=":", zorder=2)
+
+    ax.set_xticks(x_pct)
+    ax.set_xticklabels([f"{c}" for c in x_pct], fontsize=9)
+    ax.set_xlim(46, 94)
+    ax.set_xlabel("Shortcut correlation strength (%)", fontsize=10)
+    ax.set_ylabel("Shortcut gap (%)", fontsize=10)
+
+    # Match paper: range -17.5 to 0.5, ticks every 2.5
+    ax.set_ylim(-17.5, 1.0)
+    ax.set_yticks([-17.5, -15, -12.5, -10, -7.5, -5, -2.5, 0])
+
+    ax.legend(frameon=True, fontsize=9, loc="lower left")
+    ax.set_title("Separation emerges as correlation carries signal (Experiment I)",
+                 fontsize=10.5, fontweight="bold")
+    _style_ax(ax, grid_axis="y")
+    save(fig, "fig11_correlation_ablation.pdf")
+
+
+# =====================================================================
+# FIGURE 12: Representation-Space Cliff (Experiment M)
+# =====================================================================
+def fig12():
+    data = load("exp_m")
+    if data is None:
+        print("  SKIP (no exp_m.json found)")
+        return False
+
+    positions = data["positions_tested"]
+    fig, ax = plt.subplots(figsize=(7.0, 3.5), constrained_layout=True)
+
+    arch_cfg = [
+        ("transformer", STYLE["trans"], "o", "Transformer"),
+        ("lstm",        STYLE["lstm"],  "s", "LSTM"),
+        ("mamba",       STYLE["mamba"], "^", "Mamba"),
+    ]
+    for arch, color, marker, label in arch_cfg:
+        means, stds = [], []
+        for pos in positions:
+            sims = [r["positions"][f"frac_{pos}"]["final_token_cos_sim"]
+                    for r in data["runs"] if r["arch"] == arch]
+            means.append(np.mean(sims))
+            stds.append(np.std(sims, ddof=1) if len(sims) > 1 else 0)
+        means = np.array(means); stds = np.array(stds)
+        ax.plot(positions, means, f"-{marker}", color=color, lw=2.0,
+                markersize=7, markerfacecolor="white", markeredgecolor=color,
+                markeredgewidth=1.6, label=label, zorder=5)
+        ax.fill_between(positions, means - stds, means + stds,
+                        color=color, alpha=0.10, linewidth=0, zorder=3)
+
+    ax.fill_between([92.5, 101.5], 0.45, 1.06, alpha=0.08,
+                    color=STYLE["mamba_dk"], linewidth=0, zorder=1)
+    ax.text(96.5, 0.48, "cliff\nzone", ha="center", va="bottom", fontsize=8.5,
+            color=STYLE["mamba_dk"], fontstyle="italic", fontweight="bold")
+    ax.axhline(1.0, color=STYLE["spine"], lw=0.7, ls=":", zorder=2)
+
+    # "Mamba: 0.999 to 0.618 (representation cliff)" annotation - matches paper
+    ax.annotate("Mamba: 0.999 to 0.618\n(representation cliff)",
+                xy=(100, 0.618), xytext=(80, 0.62),
+                fontsize=8.5, color=STYLE["mamba_dk"], fontstyle="italic",
+                ha="center",
+                arrowprops=dict(arrowstyle="->", color=STYLE["mamba_dk"],
+                                lw=1.0, connectionstyle="arc3,rad=-0.25"),
+                bbox=dict(boxstyle="round,pad=0.4", fc="white",
+                          ec=STYLE["mamba_dk"], alpha=0.95, linewidth=0.8),
+                zorder=10)
+
+    ax.set_xlabel("Shortcut position (% of sequence)", fontsize=10)
+    ax.set_ylabel("Final-token cosine similarity\n(clean vs shortcut-inserted)", fontsize=10)
+    ax.set_xlim(-3, 103); ax.set_ylim(0.45, 1.06)
+    ax.set_xticks(positions)
+    ax.legend(loc="lower left", frameon=True, fontsize=8.5)
+    ax.set_title("Representation-space cliff mirrors accuracy cliff (Experiment M)",
+                 fontsize=10, fontweight="bold")
+    _style_ax(ax, grid_axis="y")
+    save(fig, "fig_repr_cliff.pdf")
+    return True
+
+
+# =====================================================================
+# FIGURE 13: Pretrained Backbone Control (Experiment L)
+# =====================================================================
+def fig13():
+    data = load("exp_l")
+    if data is None:
+        print("  SKIP (no exp_l.json found)")
+        return False
+
+    # Exclude position 0 (pretrained model shows noisy artifacts there;
+    # paper figure starts at position 25 for clarity)
+    positions = [p for p in data["positions_tested"] if p > 0]
+    fig, ax = plt.subplots(figsize=(7.0, 3.5), constrained_layout=True)
+
+    # Pretrained flat curve
+    means, stds = [], []
+    for pos in positions:
+        gaps = [r["positions"][f"frac_{pos}"]["gap"] for r in data["runs"]]
+        means.append(np.mean(gaps))
+        stds.append(np.std(gaps, ddof=1) if len(gaps) > 1 else 0)
+    means = np.array(means); stds = np.array(stds)
+    # Two-line palette complementing main paper figs (Wong colorblind-safe):
+    # deep blue for pretrained (the "no-cliff" baseline), keep vermillion
+    # for the from-scratch Mamba so its colour matches Mamba in figs 1-6.
+    PRETRAINED_BLUE = "#0072B2"
+    ax.plot(positions, means, "-D", color=PRETRAINED_BLUE, lw=2.0,
+            markersize=7, markerfacecolor="white", markeredgecolor=PRETRAINED_BLUE,
+            markeredgewidth=1.6, label="Pretrained Mamba-130M (frozen) + linear head",
+            zorder=5)
+    ax.fill_between(positions, means - stds, means + stds,
+                    color=PRETRAINED_BLUE, alpha=0.13, linewidth=0, zorder=3)
+
+    # Overlay from-scratch Mamba cliff from Exp H for comparison
+    if eh is not None:
+        fs_m = np.array([np.mean(h_mamba_pos[p]) for p in positions])
+        fs_s = np.array([np.std(h_mamba_pos[p], ddof=1) for p in positions])
+        ax.plot(positions, fs_m, "--^", color=STYLE["mamba"], lw=2.0,
+                markersize=7, markerfacecolor="white", markeredgecolor=STYLE["mamba"],
+                markeredgewidth=1.6, label="From-scratch custom Mamba (Exp H)",
+                zorder=4)
+        ax.fill_between(positions, fs_m - fs_s, fs_m + fs_s,
+                        color=STYLE["mamba"], alpha=0.10, linewidth=0, zorder=2)
+
+    ax.axhline(0, color=STYLE["spine"], lw=0.7, ls=":", zorder=2)
+
+    # Cliff zone shaded (matches paper)
+    ax.fill_between([92.5, 103], -16, 2, alpha=0.07,
+                    color=STYLE["mamba_dk"], linewidth=0, zorder=1)
+
+    # "Sharp cliff at 100%" annotation - shifted slightly right (xtext=85, was 78)
+    # per user feedback, while keeping clear separation from the cliff curve.
+    ax.annotate("Sharp cliff at 100%",
+                xy=(100, -10.5), xytext=(85, -13.5),
+                fontsize=8.5, color=STYLE["mamba_dk"], fontstyle="italic",
+                ha="center",
+                arrowprops=dict(arrowstyle="->", color=STYLE["mamba_dk"],
+                                lw=1.0, connectionstyle="arc3,rad=0.3"),
+                bbox=dict(boxstyle="round,pad=0.4", fc="white",
+                          ec=STYLE["mamba_dk"], alpha=0.95, linewidth=0.8),
+                zorder=10)
+
+    ax.set_xlabel("Shortcut position (% of sequence)", fontsize=10)
+    ax.set_ylabel("Shortcut gap (%)", fontsize=10)
+    ax.set_xlim(20, 105); ax.set_xticks(positions)
+    ax.set_ylim(-16, 2)
+    ax.legend(loc="lower left", frameon=True, fontsize=9)
+    ax.set_title("Cliff does not transfer to frozen pretrained backbone (Experiment L)",
+                 fontsize=10.5, fontweight="bold")
+    _style_ax(ax, grid_axis="y")
+    save(fig, "fig_pretrained.pdf")
+    return True
+
+
+# =====================================================================
+# FIGURE 14: Cliff Emergence During Training (Experiment P)
+# =====================================================================
+def fig14():
+    # Rebuilt from scratch for visual clarity:
+    # - Dual-axis layout (clean accuracy left in green, gap@100% right in red)
+    # - Subtle fill bands, clean error bars, no axis-color tinting noise
+    # - Critical window shading anchored to plot top, label inside the band
+    # - Single combined legend below the plot
+    data = load("exp_p")
+    if data is None:
+        print("  SKIP (no exp_p.json found)")
+        return False
+
+    checkpoint_epochs = data["checkpoint_epochs"]
+    # Two-tone palette complementing main paper figs:
+    # deep blue for clean accuracy (the "good" signal),
+    # vermillion for shortcut gap (the "bad" signal that emerges).
+    BLUE  = "#0072B2"
+    RED   = "#D55E00"
+
+    fig, ax_left = plt.subplots(figsize=(7.0, 3.8), constrained_layout=True)
+    ax_right = ax_left.twinx()
+
+    # Aggregate clean accuracy and gap@100% across seeds
+    clean_means, clean_stds = [], []
+    gap_means, gap_stds = [], []
+    for ep in checkpoint_epochs:
+        cleans, gaps = [], []
+        for run in data["runs"]:
+            for t in run["trajectory"]:
+                if t["epoch"] == ep:
+                    cleans.append(t["clean_acc"])
+                    gaps.append(t["positions"]["frac_100"]["gap"])
+        clean_means.append(np.mean(cleans) if cleans else np.nan)
+        clean_stds.append(np.std(cleans, ddof=1) if len(cleans) > 1 else 0)
+        gap_means.append(np.mean(gaps) if gaps else np.nan)
+        gap_stds.append(np.std(gaps, ddof=1) if len(gaps) > 1 else 0)
+    clean_means = np.array(clean_means); clean_stds = np.array(clean_stds)
+    gap_means = np.array(gap_means);     gap_stds = np.array(gap_stds)
+
+    # Plot bounds chosen to make both axes share visual range nicely
+    LEFT_LIM  = (75, 105)
+    RIGHT_LIM = (-15, 3)
+
+    # Critical window shading - subtle, anchored to plot bounds
+    ax_left.fill_between([4.7, 10.3], LEFT_LIM[0], LEFT_LIM[1],
+                         alpha=0.09, color=STYLE["mamba_dk"],
+                         linewidth=0, zorder=1)
+    ax_left.text(7.5, LEFT_LIM[1] - 1.5, "cliff emergence window",
+                 ha="center", va="top", fontsize=8.5,
+                 color=STYLE["mamba_dk"], fontstyle="italic", fontweight="bold")
+
+    # Reference: zero line on right axis (gap = 0)
+    ax_right.axhline(0, color=STYLE["subtext"], lw=0.8, ls=":", zorder=2)
+
+    # Left axis: clean accuracy (green, solid line, circle markers)
+    ax_left.fill_between(checkpoint_epochs, clean_means - clean_stds,
+                         clean_means + clean_stds,
+                         alpha=0.15, color=BLUE, linewidth=0, zorder=3)
+    line_clean = ax_left.errorbar(
+        checkpoint_epochs, clean_means, yerr=clean_stds,
+        fmt="-o", color=BLUE, lw=2.2, markersize=7.5,
+        markerfacecolor="white", markeredgecolor=BLUE, markeredgewidth=1.6,
+        capsize=3, capthick=0.9, elinewidth=0.9,
+        label="Clean accuracy (left axis)", zorder=5)
+
+    # Right axis: gap @ 100% (red, dashed line, triangle markers)
+    ax_right.fill_between(checkpoint_epochs, gap_means - gap_stds,
+                          gap_means + gap_stds,
+                          alpha=0.15, color=RED, linewidth=0, zorder=3)
+    line_gap = ax_right.errorbar(
+        checkpoint_epochs, gap_means, yerr=gap_stds,
+        fmt="--^", color=RED, lw=2.2, markersize=7.5,
+        markerfacecolor="white", markeredgecolor=RED, markeredgewidth=1.6,
+        capsize=3, capthick=0.9, elinewidth=0.9,
+        label="Shortcut gap at 100% (right axis)", zorder=5)
+
+    # Axes labels - colored to match their data
+    ax_left.set_xlabel("Training epoch", fontsize=10)
+    ax_left.set_ylabel("Clean accuracy (%)", fontsize=10, color=BLUE)
+    ax_right.set_ylabel("Shortcut gap at 100% (%)", fontsize=10, color=RED)
+
+    # Tick label colors
+    ax_left.tick_params(axis="y", colors=BLUE, labelsize=8.5)
+    ax_right.tick_params(axis="y", colors=RED, labelsize=8.5)
+
+    # Spines: only show colored ones for left/right that match the data
+    ax_left.spines["left"].set_color(BLUE)
+    ax_left.spines["left"].set_linewidth(1.2)
+    ax_right.spines["right"].set_visible(True)
+    ax_right.spines["right"].set_color(RED)
+    ax_right.spines["right"].set_linewidth(1.2)
+    ax_right.spines["top"].set_visible(False)
+
+    ax_left.set_xticks(checkpoint_epochs)
+    ax_left.set_xlim(0, max(checkpoint_epochs) + 2)
+    ax_left.set_ylim(*LEFT_LIM)
+    ax_right.set_ylim(*RIGHT_LIM)
+
+    # Combined legend below
+    ax_left.legend(handles=[line_clean, line_gap],
+                   labels=["Clean accuracy (left axis)",
+                           "Shortcut gap at 100% (right axis)"],
+                   loc="upper center", bbox_to_anchor=(0.5, -0.16),
+                   ncol=2, frameon=False, fontsize=9)
+
+    ax_left.set_title("Cliff emerges during task-learning window (Experiment P)",
+                      fontsize=10.5, fontweight="bold")
+    # Light horizontal grid only on left axis to avoid double-grid clutter
+    _style_ax(ax_left, grid_axis="y")
+    ax_right.grid(False)
+    save(fig, "fig_cliff_emergence.pdf")
+    return True
 
 
 # =====================================================================
 # RUN ALL
 # =====================================================================
 if __name__ == "__main__":
-    print(f"Generating 10 PDFs -> {os.path.abspath(OUTPUT_DIR)}/\n")
+    figures = [
+        ("fig1_position_ablation.pdf",      "Position cliff (Exp H)",                fig01),
+        ("fig2_main_hierarchy.pdf",         "Main hierarchy (Exps A, B)",            fig02),
+        ("fig3_per_scenario.pdf",           "Per-scenario breakdown (Exp G)",        fig03),
+        ("fig4_scale_invariance.pdf",       "Scale invariance (Exp D)",              fig04),
+        ("fig5_training_condition.pdf",     "Training condition (Exp E)",            fig05),
+        ("fig6_posenc_ablation.pdf",        "Positional encoding ablation (Exp C)",  fig06),
+        ("fig7_per_seed.pdf",               "Per-seed analysis (Exp B)",             fig07),
+        ("fig8_shortcut_only.pdf",          "Shortcut-only baseline (Exp F)",        fig08),
+        ("fig9_lstm_bimodality.pdf",        "LSTM training dynamics",                fig09),
+        ("fig10_magic_seed.pdf",            "Mamba training dynamics (magic seed)",  fig10),
+        ("fig11_correlation_ablation.pdf",  "Correlation strength ablation (Exp I)", fig11),
+        ("fig_repr_cliff.pdf",              "Representation cliff (Exp M)",          fig12),
+        ("fig_pretrained.pdf",              "Pretrained backbone (Exp L)",           fig13),
+        ("fig_cliff_emergence.pdf",         "Cliff emergence (Exp P)",               fig14),
+    ]
+
+    total = len(figures)
+    print(f"Generating up to {total} PDFs -> {os.path.abspath(OUTPUT_DIR)}/\n")
     np.random.seed(42)
-    print(" 1/10  fig1_position_ablation.pdf   [figure*, 7.0in]   HERO"); fig01()
-    print(" 2/10  fig2_main_hierarchy.pdf      [figure*, 7.0in]"); fig02()
-    print(" 3/10  fig3_per_scenario.pdf        [figure*, 7.0in]"); fig03()
-    print(" 4/10  fig4_scale_invariance.pdf    [figure*, 7.0in]"); fig04()
-    print(" 5/10  fig5_training_condition.pdf  [figure*, 7.0in]"); fig05()
-    print(" 6/10  fig6_posenc_ablation.pdf     [figure*, 7.0in]"); fig06()
-    print(" 7/10  fig7_per_seed.pdf            [figure,  3.5in]"); fig07()
-    print(" 8/10  fig8_shortcut_only.pdf       [figure,  3.5in]"); fig08()
-    print(" 9/10  fig9_lstm_bimodality.pdf     [figure,  3.5in]  supplementary"); fig09()
-    print("10/10  fig10_magic_seed.pdf         [figure,  3.5in]  supplementary"); fig10()
-    print(f"\nAll 10 PDFs generated from JSON results.")
+
+    generated = 0
+    skipped = 0
+    for i, (name, desc, func) in enumerate(figures, 1):
+        print(f"{i:2d}/{total}  {name:<35s} {desc}")
+        try:
+            result = func()
+            if result is False:
+                skipped += 1
+            else:
+                generated += 1
+        except Exception as e:
+            print(f"  FAIL {name}: {e}")
+            skipped += 1
+
+    print(f"\n{generated} PDFs generated, {skipped} skipped.")
+    if skipped:
+        print("Skipped figures had no JSON data available. Run the corresponding")
+        print("experiment script first, then re-run this script.")

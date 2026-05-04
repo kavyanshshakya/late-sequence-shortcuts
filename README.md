@@ -74,13 +74,12 @@ pip install -r requirements.txt
 python scripts/generate_figures.py
 ```
 
-Reads `results/provided/` and writes publication-ready PDFs to a `figures/`
-directory at the repo root.
+Reads `results/provided/` and writes figure PDFs to a `figures/`
+directory at the repo root. If you have run experiments yourself, the script
+checks `results/` first and uses your fresh data when available, falling back
+to the canonical `results/provided/` for experiments you have not re-run.
 
-Note: figures 12, 13, 14 (representation cliff, pretrained backbone, cliff
-emergence) are produced by the corresponding experiment scripts directly:
-`exp_m.py`, `exp_l.py`, and `exp_p.py`. `generate_figures.py` covers
-figures 1–11.
+All 14 figures are produced by `generate_figures.py`.
 
 ### Reproduce experiments (GPU required)
 
@@ -157,26 +156,27 @@ Experiment P trains for 50 epochs with evaluation at 9 checkpoint epochs.
 
 ## Figures
 
-`generate_figures.py` produces figures 1–11 from `results/provided/`.
-Figures 12, 13, 14 are produced by `exp_m.py`, `exp_l.py`, and `exp_p.py`
-respectively (each generates its own figure as part of its run).
+`generate_figures.py` produces all 14 figures from JSON result files.
+For each experiment, it tries `results/<exp>.json` first (your fresh runs),
+then falls back to `results/provided/<exp>.json` (canonical). Only generates
+figures whose JSON data is available; skips the rest with a warning.
 
-| #  | File                          | Content                                                  | Source script              |
-|----|-------------------------------|----------------------------------------------------------|----------------------------|
-| 1  | fig1_position_ablation.pdf    | End vs begin shortcut position (hero figure)             | generate_figures.py        |
-| 2  | fig2_main_hierarchy.pdf       | Attention-vs-sequential split (small + medium scale)     | generate_figures.py        |
-| 3  | fig3_per_scenario.pdf         | Per-scenario gap and true-belief accuracy across seeds   | generate_figures.py        |
-| 4  | fig4_scale_invariance.pdf     | Scale invariance across Mamba implementations (Exp D)    | generate_figures.py        |
-| 5  | fig5_training_condition.pdf   | Clean-trained vs shortcut-trained (Exp E)                | generate_figures.py        |
-| 6  | fig6_posenc_ablation.pdf      | Positional encoding ablation (Exp C)                     | generate_figures.py        |
-| 7  | fig7_per_seed.pdf             | Per-seed breakdown showing LSTM bimodality               | generate_figures.py        |
-| 8  | fig8_shortcut_only.pdf        | Shortcut-only baseline (Exp F)                           | generate_figures.py        |
-| 9  | fig9_lstm_bimodality.pdf      | LSTM training dynamics: robust vs fragile seeds          | generate_figures.py        |
-| 10 | fig10_magic_seed.pdf          | Mamba-1 training dynamics: the "magic seed"              | generate_figures.py        |
-| 11 | fig11_correlation_ablation.pdf| Correlation strength ablation (Exp I)                    | generate_figures.py        |
-| 12 | fig_repr_cliff.pdf            | Representation-space cliff (Exp M)                       | exp_m.py                   |
-| 13 | fig_pretrained.pdf            | Pretrained backbone evaluation (Exp L)                   | exp_l.py                   |
-| 14 | fig_cliff_emergence.pdf       | Cliff emergence during task-learning window (Exp P)      | exp_p.py                   |
+| #  | File                          | Content                                                  |
+|----|-------------------------------|----------------------------------------------------------|
+| 1  | fig1_position_ablation.pdf    | End vs begin shortcut position (hero figure)             |
+| 2  | fig2_main_hierarchy.pdf       | Attention-vs-sequential split (small + medium scale)     |
+| 3  | fig3_per_scenario.pdf         | Per-scenario gap and true-belief accuracy across seeds   |
+| 4  | fig4_scale_invariance.pdf     | Scale invariance across Mamba implementations (Exp D)    |
+| 5  | fig5_training_condition.pdf   | Clean-trained vs shortcut-trained (Exp E)                |
+| 6  | fig6_posenc_ablation.pdf      | Positional encoding ablation (Exp C)                     |
+| 7  | fig7_per_seed.pdf             | Per-seed breakdown showing LSTM bimodality               |
+| 8  | fig8_shortcut_only.pdf        | Shortcut-only baseline (Exp F)                           |
+| 9  | fig9_lstm_bimodality.pdf      | LSTM training dynamics: robust vs fragile seeds          |
+| 10 | fig10_magic_seed.pdf          | Mamba-1 training dynamics: the "magic seed"              |
+| 11 | fig11_correlation_ablation.pdf| Correlation strength ablation (Exp I)                    |
+| 12 | fig_repr_cliff.pdf            | Representation-space cliff (Exp M)                       |
+| 13 | fig_pretrained.pdf            | Pretrained backbone evaluation (Exp L)                   |
+| 14 | fig_cliff_emergence.pdf       | Cliff emergence during task-learning window (Exp P)      |
 
 The repository does not ship rendered figure files. Run
 `python scripts/generate_figures.py` to build them from the canonical results.
